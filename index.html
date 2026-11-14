@@ -387,7 +387,7 @@
         <div class="grid md:grid-cols-2 gap-6 mb-8">
             <div class="card p-6 bg-yellow-50 border-yellow-200">
                 <h4 class="font-semibold text-yellow-800 mb-2">🔑 78.06% HTTPS Prevalence</h4>
-                <p class="text-sm text-yellow-700 leading-relaxed">Modern phishing sites overwhelmingly use HTTPS certificates, proving that checking for <code class="font-mono text-xs bg-yellow-100 px-1 py-0.5 rounded">https://</code> alone is insufficient without multivariate context. The padlock icon is no longer a reliable safety indicator.</p>
+                <p class="text-sm text-yellow-700 leading-relaxed">Across the whole dataset (both classes combined), 78.06% of URLs use HTTPS, so checking for <code class="font-mono text-xs bg-yellow-100 px-1 py-0.5 rounded">https://</code> alone is unlikely to separate the classes without multivariate context. (Class-conditional HTTPS rates should be reported to confirm this.)</p>
             </div>
             <div class="card p-6 bg-blue-50 border-blue-200">
                 <h4 class="font-semibold text-blue-800 mb-2">📊 Leak-Free Scaling Hygiene</h4>
@@ -442,29 +442,29 @@
 
         <div class="card p-6 mb-8 border-l-4 border-purple-500">
             <h4 class="font-semibold text-surface-800 mb-2">Experiment A Objective</h4>
-            <p class="text-surface-600 text-sm leading-relaxed">Audit the suspicious pre-computed dataset columns (<code class="font-mono text-xs bg-surface-100 px-1 py-0.5 rounded">URLSimilarityIndex</code> and <code class="font-mono text-xs bg-surface-100 px-1 py-0.5 rounded">TLDLegitimateProb</code>) strictly on the <strong>Training Split (141,222 rows)</strong> before touching validation or test sets.</p>
+            <p class="text-surface-600 text-sm leading-relaxed">Audit the suspicious pre-computed dataset columns (<code class="font-mono text-xs bg-surface-100 px-1 py-0.5 rounded">URLSimilarityIndex</code> and <code class="font-mono text-xs bg-surface-100 px-1 py-0.5 rounded">TLDLegitimateProb</code>). Models are trained on the <strong>Training Split (141,222 rows)</strong> and evaluated out-of-sample on the <strong>Validation Set (47,074 rows)</strong> to prevent unpruned Decision Tree training-set memorization from distorting the comparison.</p>
         </div>
 
         <!-- Single-Feature AUC -->
         <div class="grid md:grid-cols-2 gap-6 mb-8">
             <div class="card p-6">
-                <h4 class="font-semibold text-surface-800 mb-4">Single-Feature Standalone ROC-AUC</h4>
+                <h4 class="font-semibold text-surface-800 mb-4">Single-Feature Standalone ROC-AUC <span class="badge badge-blue ml-2">Validation Set</span></h4>
                 <div class="space-y-4">
                     <div>
                         <div class="flex justify-between text-sm mb-1">
                             <span class="font-mono text-xs">TLDLegitimateProb</span>
-                            <span class="font-mono text-sm font-bold text-yellow-600">0.6088</span>
+                            <span class="font-mono text-sm font-bold text-yellow-600">0.6076</span>
                         </div>
-                        <div class="w-full bg-surface-200 rounded-full h-3"><div class="bg-yellow-400 h-3 rounded-full" style="width:60.88%"></div></div>
+                        <div class="w-full bg-surface-200 rounded-full h-3"><div class="bg-yellow-400 h-3 rounded-full" style="width:60.76%"></div></div>
                         <p class="text-xs text-surface-500 mt-1">Weak standalone predictor; relies on external historical TLD frequency priors.</p>
                     </div>
                     <div>
                         <div class="flex justify-between text-sm mb-1">
                             <span class="font-mono text-xs">URLSimilarityIndex</span>
-                            <span class="font-mono text-sm font-bold text-red-600">0.9961</span>
+                            <span class="font-mono text-sm font-bold text-red-600">0.9959</span>
                         </div>
-                        <div class="w-full bg-surface-200 rounded-full h-3"><div class="bg-red-500 h-3 rounded-full" style="width:99.61%"></div></div>
-                        <p class="text-xs text-red-600 mt-1 font-semibold">🚩 Massive red flag! A single number separates phishing from legitimate with 99.61% AUC before any model is trained.</p>
+                        <div class="w-full bg-surface-200 rounded-full h-3"><div class="bg-red-500 h-3 rounded-full" style="width:99.59%"></div></div>
+                        <p class="text-xs text-red-600 mt-1 font-semibold">🚩 Massive red flag! A single number separates phishing from legitimate with 99.59% AUC on unseen validation data.</p>
                     </div>
                 </div>
             </div>
@@ -479,7 +479,7 @@
 
         <!-- Model AUC Jump Chart -->
         <div class="card p-6 mb-8">
-            <h4 class="font-semibold text-surface-800 mb-4">Model ROC-AUC Jump: With vs. Without Suspicious Columns (Train Set)</h4>
+            <h4 class="font-semibold text-surface-800 mb-4">Model ROC-AUC Jump: With vs. Without Suspicious Columns <span class="badge badge-blue ml-2">Validation Set</span></h4>
             <div class="grid md:grid-cols-2 gap-6">
                 <div>
                     <div style="max-width:500px;">
@@ -491,15 +491,18 @@
                         <div class="flex items-center gap-2 mb-2">
                             <span class="badge badge-gray">Logistic Regression</span>
                         </div>
-                        <p class="text-sm text-surface-600">Without suspicious: <strong class="font-mono">0.9959</strong> → With suspicious: <strong class="font-mono text-red-600">0.9999</strong></p>
-                        <p class="text-xs text-red-600 font-semibold mt-1">+0.0041 jump — wiping out nearly 98% of remaining error</p>
+                        <p class="text-sm text-surface-600">Without suspicious: <strong class="font-mono">0.9956</strong> → With suspicious: <strong class="font-mono text-red-600">0.9999</strong></p>
+                        <p class="text-xs text-red-600 font-semibold mt-1">+0.0042 out-of-sample jump — wiping out nearly 98% of remaining error</p>
                     </div>
                     <div class="p-4 bg-surface-50 rounded-xl">
                         <div class="flex items-center gap-2 mb-2">
                             <span class="badge badge-gray">Decision Tree</span>
                         </div>
-                        <p class="text-sm text-surface-600">Without suspicious: <strong class="font-mono">0.9987</strong> → With suspicious: <strong class="font-mono text-red-600">1.0000</strong></p>
-                        <p class="text-xs text-red-600 font-semibold mt-1">+0.0013 jump to artificial perfection</p>
+                        <p class="text-sm text-surface-600">Without suspicious: <strong class="font-mono">0.9956</strong> → With suspicious: <strong class="font-mono text-red-600">0.9999</strong></p>
+                        <p class="text-xs text-red-600 font-semibold mt-1">+0.0044 out-of-sample jump (0.9956 → 0.9999)</p>
+                    </div>
+                    <div class="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                        <p class="text-xs text-purple-800 leading-relaxed"><strong>Evaluating on Validation Prevents Memorization Artifacts:</strong> On the training split, an unpruned Decision Tree achieves an artificial 1.0000 ROC-AUC (+0.0013 over 0.9987) purely through training-set memorization. Evaluating out-of-sample on the <strong>Validation Set (47,074 rows)</strong> reveals the true unadulterated baseline (0.9956) and demonstrates that injecting oracle reference features causes an identical, dramatic leap (+0.0044 to 0.9999) across both linear log-odds and tree-based decision surfaces.</p>
                     </div>
                 </div>
             </div>
@@ -729,7 +732,7 @@
             <div class="flex flex-wrap gap-2 mb-4">
                 <button class="px-3 py-2 bg-green-100 text-green-800 rounded-lg text-xs font-bold hover:bg-green-200 transition" onclick="setThreshold(0.0809)">Tuned (τ=0.0809, FPR≤1%)</button>
                 <button class="px-3 py-2 bg-blue-100 text-blue-800 rounded-lg text-xs font-bold hover:bg-blue-200 transition" onclick="setThreshold(0.50)">Default (τ=0.5000)</button>
-                <button class="px-3 py-2 bg-purple-100 text-purple-800 rounded-lg text-xs font-bold hover:bg-purple-200 transition" onclick="setThreshold(0.85)">Ultra-Strict (τ=0.8500, FPR≤0.1%)</button>
+                <button class="px-3 py-2 bg-purple-100 text-purple-800 rounded-lg text-xs font-bold hover:bg-purple-200 transition" onclick="setThreshold(0.90)">Strict (τ=0.9000, FPR≈0.03%)</button>
             </div>
 
             <!-- Slider -->
@@ -738,10 +741,10 @@
                     <label class="text-sm font-semibold text-surface-700">Decision Threshold $\tau$</label>
                     <span id="thresholdValue" class="font-mono text-lg font-bold text-blue-600">0.0809</span>
                 </div>
-                <input type="range" id="thresholdSlider" min="0.01" max="0.95" step="0.001" value="0.0809" oninput="updateThreshold(this.value)">
+                <input type="range" id="thresholdSlider" min="0.01" max="0.99" step="0.001" value="0.0809" oninput="updateThreshold(this.value)">
                 <div class="flex justify-between text-xs text-surface-400 mt-1">
                     <span>0.01 (catch-all)</span>
-                    <span>0.95 (ultra-strict)</span>
+                    <span>0.99 (ultra-strict)</span>
                 </div>
             </div>
 
@@ -850,7 +853,7 @@
         <!-- Limitations -->
         <div class="card p-6">
             <h4 class="font-semibold text-surface-800 mb-4">Limitations &amp; Risks</h4>
-            <div class="grid md:grid-cols-3 gap-4">
+            <div class="grid md:grid-cols-3 gap-4 mb-4">
                 <div class="p-4 bg-surface-50 rounded-xl border-t-4 border-red-400">
                     <h5 class="font-semibold text-sm text-surface-800 mb-2">Free Cloud / PaaS Subdomain Blindspot</h5>
                     <p class="text-xs text-surface-600 leading-relaxed">Attackers hosting phishing kits on legitimate cloud platforms (<code class="font-mono text-xs">repl.co</code>, <code class="font-mono text-xs">pantheonsite.io</code>, <code class="font-mono text-xs">github.io</code>, <code class="font-mono text-xs">vercel.app</code>) inherit clean domain structures and valid HTTPS certificates.</p>
@@ -862,6 +865,30 @@
                 <div class="p-4 bg-surface-50 rounded-xl border-t-4 border-blue-400">
                     <h5 class="font-semibold text-sm text-surface-800 mb-2">Dataset Construction Bias</h5>
                     <p class="text-xs text-surface-600 leading-relaxed">In PhiUSIIL, legitimate URLs are predominantly root domains with <code class="font-mono text-xs">https://www.</code>, while many phishing URLs have long paths or missing HTTPS. A model trained on this benchmark can over-rely on <code class="font-mono text-xs">uses_https</code> and <code class="font-mono text-xs">path_len_ratio</code> unless verified on external traffic.</p>
+                </div>
+            </div>
+
+            <!-- Methodological & Deployment Limitations (Phase 1 Fix) -->
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="p-5 bg-purple-50/60 rounded-xl border-t-4 border-purple-500 border border-purple-100">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="badge badge-gray text-xs">Methodological Nuance</span>
+                        <h5 class="font-semibold text-sm text-purple-900">Train-Serve Feature Availability (Oracle Dependency) vs. Target Leakage</h5>
+                    </div>
+                    <p class="text-xs text-purple-950/80 leading-relaxed mb-2">While we colloquially refer to <code class="font-mono text-xs bg-purple-100 px-1 py-0.5 rounded">URLSimilarityIndex</code> and <code class="font-mono text-xs bg-purple-100 px-1 py-0.5 rounded">TLDLegitimateProb</code> as "feature leakage", strictly speaking they represent a <strong>prediction-time feature availability (train-serve) mismatch</strong>.</p>
+                    <p class="text-xs text-purple-950/80 leading-relaxed">These columns do not leak the literal binary label vector directly. Rather, they rely on <em>offline oracle reference lists</em> and post-hoc threat models (where downloading page content or querying global domain similarity clusters is allowed). At click-time under our strict <strong>zero-packet constraint</strong>, a browser client cannot query an offline oracle database without incurring unacceptable network latency and leaking the user's IP address to attackers.</p>
+                </div>
+
+                <div class="p-5 bg-amber-50/60 rounded-xl border-t-4 border-amber-500 border border-amber-100">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="badge badge-yellow text-xs">Operational Deployment Risk</span>
+                        <h5 class="font-semibold text-sm text-amber-900">Base-Rate Fallacy in Real-World Browser Traffic</h5>
+                    </div>
+                    <p class="text-xs text-amber-950/80 leading-relaxed mb-2">On the balanced UCI benchmark (42.71% phishing prevalence), our validation-tuned operating point ($\tau = 0.0809$, $\text{FPR} = 0.92\%$) achieves an outstanding $98.77\%$ Precision. However, real-world web traffic exhibits a natural phishing prevalence of $\pi &lt; 1\%$. By Bayes' Rule for Positive Predictive Value (Precision):</p>
+                    <div class="my-2 p-2 bg-white/80 rounded border border-amber-200 text-center font-mono text-xs text-amber-900 overflow-x-auto">
+                        $$\text{PPV}(\pi) = \frac{\text{TPR} \cdot \pi}{\text{TPR} \cdot \pi + \text{FPR} \cdot (1 - \pi)}$$
+                    </div>
+                    <p class="text-xs text-amber-950/80 leading-relaxed">At $\text{TPR} = 99.33\%$ and $\text{FPR} = 0.92\%$, dropping prevalence to $\pi = 1\%$ collapses Precision to <strong>$\sim 52.3\%$</strong> (about 1 false alarm for every phishing URL caught). At $\pi = 0.1\%$, Precision plunges below <strong>$9.8\%$</strong>. A stricter operating point largely fixes this: on our test set, $\tau = 0.90$ gives $\text{TPR} = 98.96\%$ at $\text{FPR} \approx 0.030\%$ (8 false positives), which keeps Precision near <strong>$\sim 97\%$</strong> at $\pi = 1\%$ and about <strong>$77\%$</strong> at $\pi = 0.1\%$. Production browser filters therefore need much stricter operating points than the validation-tuned $\tau = 0.0809$ to avoid user alert fatigue.</p>
                 </div>
             </div>
         </div>
@@ -885,12 +912,12 @@
             <div class="card p-6 border-t-4 border-red-500">
                 <div class="text-3xl mb-3">🔍</div>
                 <h4 class="font-bold text-surface-800 mb-2">Benchmark Auditing Is Mandatory</h4>
-                <p class="text-sm text-surface-600 leading-relaxed">Public cybersecurity datasets can harbor severe feature leakage: <code class="font-mono text-xs bg-red-100 px-1 py-0.5 rounded">URLSimilarityIndex</code> achieves <strong>0.9961 AUC alone</strong>, distorting published leaderboard claims. Any research using PhiUSIIL without excluding these columns reports inflated results.</p>
+                <p class="text-sm text-surface-600 leading-relaxed">Public cybersecurity datasets can harbor severe feature leakage: <code class="font-mono text-xs bg-red-100 px-1 py-0.5 rounded">URLSimilarityIndex</code> achieves <strong>0.9959 Validation AUC alone</strong> (0.9961 on train), distorting published leaderboard claims. Studies using PhiUSIIL can report inflated results if the availability of these columns at inference time is not checked.</p>
             </div>
             <div class="card p-6 border-t-4 border-green-500">
                 <div class="text-3xl mb-3">⚙️</div>
                 <h4 class="font-bold text-surface-800 mb-2">Threshold Calibration Bridges ML &amp; Deployment</h4>
-                <p class="text-sm text-surface-600 leading-relaxed">Tuning the decision threshold on a validation set allows operators to explicitly cap false alarms ($\text{FPR} = 0.92\%$) while retaining <strong>99.33% phishing recall</strong>. This transforms a raw ML model into a deployable security filter with guaranteed operational constraints.</p>
+                <p class="text-sm text-surface-600 leading-relaxed">Tuning the decision threshold on a validation set allows operators to target a false-alarm budget (observed test $\text{FPR} = 0.92\%$) while retaining <strong>99.33% phishing recall</strong>. This turns a raw ML model into a candidate security filter whose operating constraint was met on the held-out test set (an observed result, not a deployment guarantee).</p>
             </div>
         </div>
     </div>
@@ -1070,7 +1097,7 @@ const auditData = [
     {col:"DomainLength",cat:"recomputed",catLabel:"URL-only (Recomputed)",just:"Replaced by our own hostname_length."},
     {col:"IsDomainIP",cat:"recomputed",catLabel:"URL-only (Recomputed)",just:"Replaced by our own host_is_ip."},
     {col:"TLD",cat:"target",catLabel:"URL-only (Raw string)",just:"Top-Level Domain string; represented via tld_length."},
-    {col:"URLSimilarityIndex",cat:"suspicious",catLabel:"Unclear / Pre-computed",just:"Pre-computed similarity score — investigated in Experiment A. Banned due to leakage (AUC = 0.9961 alone)."},
+    {col:"URLSimilarityIndex",cat:"suspicious",catLabel:"Unclear / Pre-computed",just:"Pre-computed similarity score — investigated in Experiment A. Banned due to prediction-time oracle dependency / leakage (Validation AUC = 0.9959 alone)."},
     {col:"CharContinuationRate",cat:"precomputed",catLabel:"URL-only (Excluded pre-computed)",just:"Dataset pre-computed character sequence metric. Opaque formula — excluded."},
     {col:"TLDLegitimateProb",cat:"suspicious",catLabel:"Unclear / Needs External Data",just:"Pre-computed TLD probability requiring external historical priors — investigated in Experiment A."},
     {col:"URLCharProb",cat:"suspicious",catLabel:"Unclear / Needs External Data",just:"Pre-computed character probability distribution — requires external corpus."},
@@ -1258,46 +1285,122 @@ function extractURLFeatures() {
 }
 
 // Run on page load
-document.addEventListener('DOMContentLoaded', () => { extractURLFeatures(); });
+document.addEventListener('DOMContentLoaded', () => {
+    extractURLFeatures();
+    updateThreshold(0.0809);
+});
 
 
 // ============================================================
 // INTERACTIVE TOOL #1: Threshold Simulator
 // ============================================================
-// Anchor data points from the Random Forest ROC curve on the test set
+// Empirical Random Forest test-set confusion matrices from simulator_data.json (100 thresholds)
 const anchorPoints = [
-    // tau, TN, FP, FN, TP
-    {tau:0.01, tn:24200, fp:2770, fn:5, tp:20099},
-    {tau:0.02, tn:25600, fp:1370, fn:18, tp:20086},
-    {tau:0.03, tn:26100, fp:870, fn:42, tp:20062},
-    {tau:0.04, tn:26350, fp:620, fn:65, tp:20039},
-    {tau:0.05, tn:26500, fp:470, fn:85, tp:20019},
-    {tau:0.06, tn:26600, fp:370, fn:100, tp:20004},
-    {tau:0.07, tn:26670, fp:300, fn:115, tp:19989},
+    {tau:0.01, tn:24793, fp:2177, fn:98, tp:20006},
+    {tau:0.02, tn:25892, fp:1078, fn:111, tp:19993},
+    {tau:0.03, tn:26167, fp:803, fn:119, tp:19985},
+    {tau:0.04, tn:26459, fp:511, fn:122, tp:19982},
+    {tau:0.05, tn:26561, fp:409, fn:126, tp:19978},
+    {tau:0.06, tn:26641, fp:329, fn:130, tp:19974},
+    {tau:0.07, tn:26684, fp:286, fn:134, tp:19970},
+    {tau:0.08, tn:26717, fp:253, fn:134, tp:19970},
     {tau:0.0809, tn:26722, fp:248, fn:134, tp:19970},
-    {tau:0.10, tn:26780, fp:190, fn:142, tp:19962},
-    {tau:0.15, tn:26850, fp:120, fn:150, tp:19954},
-    {tau:0.20, tn:26880, fp:90, fn:155, tp:19949},
-    {tau:0.25, tn:26895, fp:75, fn:158, tp:19946},
-    {tau:0.30, tn:26905, fp:65, fn:160, tp:19944},
-    {tau:0.35, tn:26910, fp:60, fn:163, tp:19941},
-    {tau:0.40, tn:26918, fp:52, fn:166, tp:19938},
-    {tau:0.45, tn:26923, fp:47, fn:169, tp:19935},
+    {tau:0.09, tn:26741, fp:229, fn:135, tp:19969},
+    {tau:0.10, tn:26759, fp:211, fn:135, tp:19969},
+    {tau:0.11, tn:26762, fp:208, fn:136, tp:19968},
+    {tau:0.12, tn:26775, fp:195, fn:139, tp:19965},
+    {tau:0.13, tn:26779, fp:191, fn:140, tp:19964},
+    {tau:0.14, tn:26783, fp:187, fn:140, tp:19964},
+    {tau:0.15, tn:26799, fp:171, fn:140, tp:19964},
+    {tau:0.16, tn:26811, fp:159, fn:141, tp:19963},
+    {tau:0.17, tn:26813, fp:157, fn:142, tp:19962},
+    {tau:0.18, tn:26821, fp:149, fn:144, tp:19960},
+    {tau:0.19, tn:26832, fp:138, fn:148, tp:19956},
+    {tau:0.20, tn:26836, fp:134, fn:149, tp:19955},
+    {tau:0.21, tn:26839, fp:131, fn:150, tp:19954},
+    {tau:0.22, tn:26844, fp:126, fn:152, tp:19952},
+    {tau:0.23, tn:26854, fp:116, fn:153, tp:19951},
+    {tau:0.24, tn:26859, fp:111, fn:153, tp:19951},
+    {tau:0.25, tn:26860, fp:110, fn:153, tp:19951},
+    {tau:0.26, tn:26864, fp:106, fn:153, tp:19951},
+    {tau:0.27, tn:26867, fp:103, fn:154, tp:19950},
+    {tau:0.28, tn:26871, fp:99, fn:155, tp:19949},
+    {tau:0.29, tn:26880, fp:90, fn:157, tp:19947},
+    {tau:0.30, tn:26882, fp:88, fn:161, tp:19943},
+    {tau:0.31, tn:26885, fp:85, fn:162, tp:19942},
+    {tau:0.32, tn:26890, fp:80, fn:162, tp:19942},
+    {tau:0.33, tn:26892, fp:78, fn:162, tp:19942},
+    {tau:0.34, tn:26895, fp:75, fn:163, tp:19941},
+    {tau:0.35, tn:26896, fp:74, fn:164, tp:19940},
+    {tau:0.36, tn:26897, fp:73, fn:164, tp:19940},
+    {tau:0.37, tn:26901, fp:69, fn:164, tp:19940},
+    {tau:0.38, tn:26901, fp:69, fn:164, tp:19940},
+    {tau:0.39, tn:26901, fp:69, fn:164, tp:19940},
+    {tau:0.40, tn:26905, fp:65, fn:164, tp:19940},
+    {tau:0.41, tn:26905, fp:65, fn:164, tp:19940},
+    {tau:0.42, tn:26909, fp:61, fn:165, tp:19939},
+    {tau:0.43, tn:26910, fp:60, fn:165, tp:19939},
+    {tau:0.44, tn:26911, fp:59, fn:165, tp:19939},
+    {tau:0.45, tn:26912, fp:58, fn:166, tp:19938},
+    {tau:0.46, tn:26914, fp:56, fn:167, tp:19937},
+    {tau:0.47, tn:26921, fp:49, fn:167, tp:19937},
+    {tau:0.48, tn:26926, fp:44, fn:169, tp:19935},
+    {tau:0.49, tn:26927, fp:43, fn:171, tp:19933},
     {tau:0.50, tn:26927, fp:43, fn:172, tp:19932},
-    {tau:0.55, tn:26932, fp:38, fn:176, tp:19928},
-    {tau:0.60, tn:26938, fp:32, fn:182, tp:19922},
-    {tau:0.65, tn:26942, fp:28, fn:190, tp:19914},
-    {tau:0.70, tn:26948, fp:22, fn:205, tp:19899},
-    {tau:0.75, tn:26953, fp:17, fn:225, tp:19879},
-    {tau:0.80, tn:26958, fp:12, fn:260, tp:19844},
-    {tau:0.85, tn:26962, fp:8, fn:310, tp:19794},
-    {tau:0.90, tn:26966, fp:4, fn:420, tp:19684},
-    {tau:0.95, tn:26969, fp:1, fn:680, tp:19424},
+    {tau:0.51, tn:26928, fp:42, fn:173, tp:19931},
+    {tau:0.52, tn:26929, fp:41, fn:173, tp:19931},
+    {tau:0.53, tn:26930, fp:40, fn:173, tp:19931},
+    {tau:0.54, tn:26932, fp:38, fn:175, tp:19929},
+    {tau:0.55, tn:26932, fp:38, fn:175, tp:19929},
+    {tau:0.56, tn:26932, fp:38, fn:177, tp:19927},
+    {tau:0.57, tn:26933, fp:37, fn:177, tp:19927},
+    {tau:0.58, tn:26934, fp:36, fn:177, tp:19927},
+    {tau:0.59, tn:26934, fp:36, fn:177, tp:19927},
+    {tau:0.60, tn:26934, fp:36, fn:179, tp:19925},
+    {tau:0.61, tn:26940, fp:30, fn:182, tp:19922},
+    {tau:0.62, tn:26941, fp:29, fn:185, tp:19919},
+    {tau:0.63, tn:26944, fp:26, fn:188, tp:19916},
+    {tau:0.64, tn:26944, fp:26, fn:188, tp:19916},
+    {tau:0.65, tn:26944, fp:26, fn:188, tp:19916},
+    {tau:0.66, tn:26945, fp:25, fn:188, tp:19916},
+    {tau:0.67, tn:26946, fp:24, fn:189, tp:19915},
+    {tau:0.68, tn:26947, fp:23, fn:189, tp:19915},
+    {tau:0.69, tn:26947, fp:23, fn:190, tp:19914},
+    {tau:0.70, tn:26949, fp:21, fn:192, tp:19912},
+    {tau:0.71, tn:26950, fp:20, fn:192, tp:19912},
+    {tau:0.72, tn:26950, fp:20, fn:193, tp:19911},
+    {tau:0.73, tn:26950, fp:20, fn:194, tp:19910},
+    {tau:0.74, tn:26950, fp:20, fn:195, tp:19909},
+    {tau:0.75, tn:26952, fp:18, fn:196, tp:19908},
+    {tau:0.76, tn:26954, fp:16, fn:199, tp:19905},
+    {tau:0.77, tn:26955, fp:15, fn:200, tp:19904},
+    {tau:0.78, tn:26956, fp:14, fn:200, tp:19904},
+    {tau:0.79, tn:26956, fp:14, fn:200, tp:19904},
+    {tau:0.80, tn:26957, fp:13, fn:200, tp:19904},
+    {tau:0.81, tn:26957, fp:13, fn:200, tp:19904},
+    {tau:0.82, tn:26958, fp:12, fn:200, tp:19904},
+    {tau:0.83, tn:26958, fp:12, fn:200, tp:19904},
+    {tau:0.84, tn:26958, fp:12, fn:204, tp:19900},
+    {tau:0.85, tn:26959, fp:11, fn:204, tp:19900},
+    {tau:0.86, tn:26960, fp:10, fn:206, tp:19898},
+    {tau:0.87, tn:26960, fp:10, fn:206, tp:19898},
+    {tau:0.88, tn:26961, fp:9, fn:206, tp:19898},
+    {tau:0.89, tn:26961, fp:9, fn:206, tp:19898},
+    {tau:0.90, tn:26962, fp:8, fn:209, tp:19895},
+    {tau:0.91, tn:26962, fp:8, fn:210, tp:19894},
+    {tau:0.92, tn:26962, fp:8, fn:212, tp:19892},
+    {tau:0.93, tn:26962, fp:8, fn:216, tp:19888},
+    {tau:0.94, tn:26962, fp:8, fn:222, tp:19882},
+    {tau:0.95, tn:26963, fp:7, fn:229, tp:19875},
+    {tau:0.96, tn:26964, fp:6, fn:239, tp:19865},
+    {tau:0.97, tn:26964, fp:6, fn:252, tp:19852},
+    {tau:0.98, tn:26966, fp:4, fn:273, tp:19831},
+    {tau:0.99, tn:26968, fp:2, fn:334, tp:19770},
 ];
 
 function interpolateThreshold(tau) {
     // Clamp
-    tau = Math.max(0.01, Math.min(0.95, tau));
+    tau = Math.max(0.01, Math.min(0.99, tau));
     // Find surrounding anchor points
     let lo = anchorPoints[0], hi = anchorPoints[anchorPoints.length - 1];
     for(let i = 0; i < anchorPoints.length - 1; i++) {
@@ -1307,14 +1410,21 @@ function interpolateThreshold(tau) {
             break;
         }
     }
-    if(lo.tau === hi.tau) return lo;
+    if(lo.tau === hi.tau || Math.abs(tau - lo.tau) < 0.0001) {
+        return { tau: lo.tau, tn: lo.tn, fp: lo.fp, fn: lo.fn, tp: lo.tp };
+    }
+    if(Math.abs(tau - hi.tau) < 0.0001) {
+        return { tau: hi.tau, tn: hi.tn, fp: hi.fp, fn: hi.fn, tp: hi.tp };
+    }
     const t = (tau - lo.tau) / (hi.tau - lo.tau);
+    const fp = Math.round(lo.fp + t * (hi.fp - lo.fp));
+    const tp = Math.round(lo.tp + t * (hi.tp - lo.tp));
     return {
         tau: tau,
-        tn: Math.round(lo.tn + t * (hi.tn - lo.tn)),
-        fp: Math.round(lo.fp + t * (hi.fp - lo.fp)),
-        fn: Math.round(lo.fn + t * (hi.fn - lo.fn)),
-        tp: Math.round(lo.tp + t * (hi.tp - lo.tp)),
+        tn: 26970 - fp,
+        fp: fp,
+        fn: 20104 - tp,
+        tp: tp,
     };
 }
 
@@ -1381,60 +1491,112 @@ function updateThreshold(val) {
 
 // ---- Chart 1: Experiment A Leakage Bar Chart ----
 document.addEventListener('DOMContentLoaded', function() {
-    // Experiment A Leakage Chart
-    const ctxLeak = document.getElementById('leakageChart').getContext('2d');
-    new Chart(ctxLeak, {
-        type: 'bar',
-        data: {
-            labels: ['TLDLegitimateProb\n(Single Feature)', 'URLSimilarityIndex\n(Single Feature)', 'LR Without\nSuspicious', 'LR With\nSuspicious', 'DT Without\nSuspicious', 'DT With\nSuspicious'],
-            datasets: [{
-                label: 'ROC-AUC',
-                data: [0.6088, 0.9961, 0.9959, 0.9999, 0.9987, 1.0000],
-                backgroundColor: [
-                    'rgba(251,191,36,0.7)',
-                    'rgba(239,68,68,0.7)',
-                    'rgba(59,130,246,0.5)',
-                    'rgba(239,68,68,0.7)',
-                    'rgba(34,197,94,0.5)',
-                    'rgba(239,68,68,0.7)',
-                ],
-                borderColor: [
-                    'rgba(251,191,36,1)',
-                    'rgba(239,68,68,1)',
-                    'rgba(59,130,246,1)',
-                    'rgba(239,68,68,1)',
-                    'rgba(34,197,94,1)',
-                    'rgba(239,68,68,1)',
-                ],
-                borderWidth: 2,
-                borderRadius: 6,
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: ctx => 'AUC: ' + ctx.parsed.y.toFixed(4)
+    // Experiment A Leakage Chart (Tool 3 - Dark Theme)
+    const elLeak = document.getElementById('leakageChart');
+    if (elLeak) {
+        new Chart(elLeak.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['TLDLegitimateProb\n(Validation)', 'URLSimilarityIndex\n(Validation)', 'LR Without\nSuspicious', 'LR With\nSuspicious', 'DT Without\nSuspicious', 'DT With\nSuspicious'],
+                datasets: [{
+                    label: 'Validation ROC-AUC',
+                    data: [0.6076, 0.9959, 0.9956, 0.9999, 0.9956, 0.9999],
+                    backgroundColor: [
+                        'rgba(251,191,36,0.7)',
+                        'rgba(239,68,68,0.7)',
+                        'rgba(59,130,246,0.5)',
+                        'rgba(239,68,68,0.7)',
+                        'rgba(34,197,94,0.5)',
+                        'rgba(239,68,68,0.7)',
+                    ],
+                    borderColor: [
+                        'rgba(251,191,36,1)',
+                        'rgba(239,68,68,1)',
+                        'rgba(59,130,246,1)',
+                        'rgba(239,68,68,1)',
+                        'rgba(34,197,94,1)',
+                        'rgba(239,68,68,1)',
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => 'Validation AUC: ' + ctx.parsed.y.toFixed(4)
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        min: 0.5,
+                        max: 1.005,
+                        ticks: { callback: v => v.toFixed(2), color: '#94a3b8' },
+                        grid: { color: 'rgba(148,163,184,0.15)' },
+                        title: { display: true, text: 'Validation ROC-AUC', color: '#94a3b8' }
+                    },
+                    x: {
+                        ticks: { color: '#94a3b8', font: {size: 10}, maxRotation: 0, autoSkip: false },
+                        grid: { display: false }
                     }
                 }
+            }
+        });
+    }
+
+    // Chart 1b: Experiment A Section 4 Canvas (expAChart - Light Theme)
+    const elExpA = document.getElementById('expAChart');
+    if (elExpA) {
+        new Chart(elExpA.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Logistic Regression', 'Decision Tree'],
+                datasets: [
+                    {
+                        label: 'Without Suspicious (Zero-Packet)',
+                        data: [0.9956, 0.9956],
+                        backgroundColor: 'rgba(59,130,246,0.65)',
+                        borderColor: 'rgba(59,130,246,1)',
+                        borderWidth: 2,
+                        borderRadius: 6,
+                    },
+                    {
+                        label: 'With Oracle Features (Leaked)',
+                        data: [0.9999, 0.9999],
+                        backgroundColor: 'rgba(239,68,68,0.65)',
+                        borderColor: 'rgba(239,68,68,1)',
+                        borderWidth: 2,
+                        borderRadius: 6,
+                    }
+                ]
             },
-            scales: {
-                y: {
-                    min: 0.5,
-                    max: 1.005,
-                    ticks: { callback: v => v.toFixed(2), color: '#94a3b8' },
-                    grid: { color: 'rgba(148,163,184,0.15)' },
-                    title: { display: true, text: 'ROC-AUC', color: '#94a3b8' }
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top', labels: { usePointStyle: true, padding: 14 } },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(4)
+                        }
+                    }
                 },
-                x: {
-                    ticks: { color: '#94a3b8', font: {size: 10}, maxRotation: 0, autoSkip: false },
-                    grid: { display: false }
+                scales: {
+                    y: {
+                        min: 0.992,
+                        max: 1.0005,
+                        ticks: { callback: v => v.toFixed(4), stepSize: 0.002 },
+                        grid: { color: 'rgba(0,0,0,0.05)' },
+                        title: { display: true, text: 'Validation ROC-AUC (Zoomed 0.992–1.000)' }
+                    },
+                    x: { grid: { display: false } }
                 }
             }
-        }
-    });
+        });
+    }
 
     // ---- Chart 2: Experiment B Model Comparison ----
     const ctxB = document.getElementById('expBChart').getContext('2d');
