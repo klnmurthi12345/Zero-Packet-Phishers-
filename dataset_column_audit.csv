@@ -1,0 +1,56 @@
+Column Name,Category,Treatment & Justification
+URL,Raw Input (URL-only source),Raw URL string used to compute our 12 zero-packet features.
+URLLength,URL-only (Recomputed),Replaced by our own url_length.
+Domain,URL-only (Raw string),Domain string; represented via our custom hostname/TLD features.
+DomainLength,URL-only (Recomputed),Replaced by our own hostname_length.
+IsDomainIP,URL-only (Recomputed),Replaced by our own host_is_ip.
+TLD,URL-only (Raw string),Top-Level Domain string; represented via tld_length.
+URLSimilarityIndex,Unclear / Pre-computed,Pre-computed similarity score; investigated in Experiment A.
+CharContinuationRate,URL-only (Excluded pre-computed),Dataset pre-computed character sequence metric.
+TLDLegitimateProb,Unclear / Needs External Data,Pre-computed TLD probability; investigated in Experiment A.
+URLCharProb,Unclear / Needs External Data,Pre-computed character probability distribution.
+TLDLength,URL-only (Recomputed),Replaced by our own tld_length.
+NoOfSubDomain,URL-only (Recomputed),Replaced by our own subdomain_count.
+HasObfuscation,URL-only (Dataset pre-computed),Replaced by our own special_symbols check.
+NoOfObfuscatedChar,URL-only (Dataset pre-computed),Replaced by our own special_symbols check.
+ObfuscationRatio,URL-only (Dataset pre-computed),Replaced by our own special_symbols check.
+NoOfLettersInURL,URL-only (Dataset pre-computed),Omitted to keep the 12-feature set compact.
+LetterRatioInURL,URL-only (Dataset pre-computed),Omitted to keep the 12-feature set compact.
+NoOfDegitsInURL,URL-only (Recomputed),Replaced by our own digit_count.
+DegitRatioInURL,URL-only (Recomputed),Replaced by our own digit_ratio.
+NoOfEqualsInURL,URL-only (Recomputed),Grouped into our own special_symbols.
+NoOfQMarkInURL,URL-only (Recomputed),Grouped into our own special_symbols.
+NoOfAmpersandInURL,URL-only (Recomputed),Grouped into our own special_symbols.
+NoOfOtherSpecialCharsInURL,URL-only (Recomputed),Grouped into our own special_symbols / dot_count / hyphen_count.
+SpacialCharRatioInURL,URL-only (Dataset pre-computed),Replaced by our own special_symbols.
+IsHTTPS,URL-only (Recomputed),Replaced by our own uses_https.
+LineOfCode,Needs Web Page (Excluded),Requires downloading page source code.
+LargestLineLength,Needs Web Page (Excluded),Requires downloading page source code.
+HasTitle,Needs Web Page (Excluded),Requires parsing HTML DOM.
+Title,Needs Web Page (Excluded),Requires downloading HTML <title> tag.
+DomainTitleMatchScore,Needs Web Page (Excluded),Requires comparing URL against HTML <title>.
+URLTitleMatchScore,Needs Web Page (Excluded),Requires comparing URL against HTML <title>.
+HasFavicon,Needs Web Page (Excluded),Requires checking HTML <link> tags / fetching favicon.
+Robots,Needs Web Page (Excluded),Requires network request for robots.txt.
+IsResponsive,Needs Web Page (Excluded),Requires rendering CSS/HTML viewport tags.
+NoOfURLRedirect,Needs Web Page (Excluded),Requires following HTTP network redirects.
+NoOfSelfRedirect,Needs Web Page (Excluded),Requires following HTTP network redirects.
+HasDescription,Needs Web Page (Excluded),Requires parsing HTML <meta> description.
+NoOfPopup,Needs Web Page (Excluded),Requires inspecting HTML/JS scripts.
+NoOfiFrame,Needs Web Page (Excluded),Requires parsing HTML <iframe> tags.
+HasExternalFormSubmit,Needs Web Page (Excluded),Requires parsing HTML <form> actions.
+HasSocialNet,Needs Web Page (Excluded),Requires inspecting page links/scripts.
+HasSubmitButton,Needs Web Page (Excluded),Requires parsing HTML <input>/<button> tags.
+HasHiddenFields,Needs Web Page (Excluded),Requires parsing HTML hidden input fields.
+HasPasswordField,Needs Web Page (Excluded),Requires parsing HTML password input fields.
+Bank,URL-only (Recomputed),Grouped into our own suspicious_words.
+Pay,URL-only (Recomputed),Grouped into our own suspicious_words.
+Crypto,URL-only (Recomputed),Grouped into our own suspicious_words.
+HasCopyrightInfo,Needs Web Page (Excluded),Requires parsing page text/footer.
+NoOfImage,Needs Web Page (Excluded),Requires parsing HTML <img> tags.
+NoOfCSS,Needs Web Page (Excluded),Requires parsing HTML stylesheet links.
+NoOfJS,Needs Web Page (Excluded),Requires parsing HTML <script> tags.
+NoOfSelfRef,Needs Web Page (Excluded),Requires parsing HTML <a> anchor tags.
+NoOfEmptyRef,Needs Web Page (Excluded),Requires parsing HTML <a> anchor tags.
+NoOfExternalRef,Needs Web Page (Excluded),Requires parsing HTML <a> anchor tags.
+label,Target Label,"1 = Legitimate, 0 = Phishing (flip to 1 = Phishing for evaluation)."
