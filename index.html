@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ES 335 project: URL-only phishing detection on the UCI PhiUSIIL benchmark, with a feature-availability audit, baselines, bootstrap confidence intervals, a domain-grouped re-split and error analysis.">
     <title>Zero-Packet Phishers — URL-Only Phishing Detection &amp; Feature Leakage</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -168,24 +169,31 @@
         <p class="text-xl lg:text-2xl font-light text-blue-200 mb-8 max-w-3xl">
             URL-Only Phishing Detection and Feature Leakage Audit on the UCI PhiUSIIL Benchmark
         </p>
+        <div class="mb-8">
+            <a href="https://github.com/klnmurthi12345/Zero-Packet-Phishers-" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-6 py-3 bg-white text-surface-900 font-bold rounded-xl hover:bg-blue-50 transition shadow-lg">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>
+                View Repository on GitHub
+            </a>
+        </div>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl">
             <div class="bg-white/10 backdrop-blur rounded-xl p-4 text-center">
                 <div class="text-2xl font-black text-blue-300">0.9969</div>
-                <div class="text-xs text-blue-200/70 font-medium mt-1">ROC-AUC</div>
+                <div class="text-xs text-blue-200/70 font-medium mt-1">Test ROC-AUC (Random Forest)<br>95% CI 0.9962–0.9975</div>
             </div>
             <div class="bg-white/10 backdrop-blur rounded-xl p-4 text-center">
                 <div class="text-2xl font-black text-green-300">99.33%</div>
-                <div class="text-xs text-blue-200/70 font-medium mt-1">Phishing Recall</div>
+                <div class="text-xs text-blue-200/70 font-medium mt-1">Phishing recall<br>at τ = 0.0809</div>
             </div>
             <div class="bg-white/10 backdrop-blur rounded-xl p-4 text-center">
                 <div class="text-2xl font-black text-yellow-300">0.92%</div>
-                <div class="text-xs text-blue-200/70 font-medium mt-1">False Positive Rate</div>
+                <div class="text-xs text-blue-200/70 font-medium mt-1">False-positive rate<br>at τ = 0.0809</div>
             </div>
             <div class="bg-white/10 backdrop-blur rounded-xl p-4 text-center">
-                <div class="text-2xl font-black text-purple-300">1.55s</div>
-                <div class="text-xs text-blue-200/70 font-medium mt-1">Feature Extraction</div>
+                <div class="text-2xl font-black text-purple-300">1.76 s</div>
+                <div class="text-xs text-blue-200/70 font-medium mt-1">Extract all 235,370 URLs<br>(notebook run, one machine)</div>
             </div>
         </div>
+        <p class="mt-6 max-w-3xl text-sm text-blue-100/90 leading-relaxed bg-white/10 rounded-xl p-4"><strong>Read these numbers with care.</strong> Every legitimate URL in this benchmark is a bare HTTPS root address, and a two-condition rule (“HTTP or has a path”) already scores 99.07% accuracy on the test split. On the 27,408 test URLs that look like bare HTTPS roots, the Random Forest’s ROC-AUC falls to 0.857 (Section 6).</p>
     </div>
 </section>
 
@@ -300,7 +308,17 @@
             </div>
         </div>
 
-        <!-- INTERACTIVE TOOL #3: Column Audit Explorer -->
+        
+        <div class="card p-6 mb-8 border-l-4 border-amber-400 bg-amber-50">
+            <h4 class="font-semibold text-amber-900 mb-2">Data-quality issues that matter for this question</h4>
+            <ul class="text-sm text-amber-900/90 leading-relaxed list-disc pl-5 space-y-1">
+                <li><strong>Label coding is inverted</strong> in the raw file (1 = legitimate); we flip it so 1 = phishing.</li>
+                <li><strong>Rows are not independent.</strong> 235,370 URLs share only 219,103 distinct hostnames; in a random split 7.7% of test URLs have a hostname that also appears in training (phishing 18.0%, legitimate 0.04%). We therefore also re-ran everything with a hostname-grouped split (Section 6).</li>
+                <li><strong>The two classes look structurally different</strong> beyond anything about phishing itself: all 134,850 legitimate URLs are bare <code class="font-mono text-xs">https://…</code> addresses with no path or query (Section 3).</li>
+                <li><strong>No missing values</strong> in the raw file; the 425 exact-duplicate URLs were all phishing and were removed before splitting.</li>
+            </ul>
+        </div>
+<!-- INTERACTIVE TOOL #3: Column Audit Explorer -->
         <div id="tool3" class="card p-8 border-2 border-blue-200">
             <div class="flex items-center gap-3 mb-2">
                 <span class="badge badge-blue">Interactive Tool #3</span>
@@ -337,7 +355,7 @@
             <div class="card-dark p-6">
                 <h4 class="font-semibold mb-4 text-blue-300">Experiment A: ROC-AUC Jump When Leaky Columns Are Injected</h4>
                 <div style="max-width:600px;margin:0 auto;">
-                    <canvas id="leakageChart" height="280"></canvas>
+                    <canvas id="leakageChart" height="280" role="img" aria-label="Bar chart of validation ROC-AUC for Logistic Regression and Decision Tree, with and without the two pre-computed columns"></canvas>
                 </div>
             </div>
         </div>
@@ -354,12 +372,13 @@
 
         <div class="card p-6 mb-8 border-l-4 border-green-500">
             <h4 class="font-semibold text-surface-800 mb-2">Custom Zero-Packet Lexical Extractor</h4>
-            <p class="text-surface-600 text-sm leading-relaxed">Built in Python using <code class="font-mono text-xs bg-surface-100 px-1 py-0.5 rounded">urllib.parse</code> and regex (<code class="font-mono text-xs bg-surface-100 px-1 py-0.5 rounded">^(?:\d{1,3}\.){3}\d{1,3}$</code> for IP check, plus suspicious keyword matching for <code class="font-mono text-xs bg-surface-100 px-1 py-0.5 rounded">['login', 'verify', 'secure', 'account', 'update', 'signin', 'banking', 'confirm']</code>). Extracted across all 235,370 URLs in <strong>1.55 seconds</strong> with <strong>0 NaNs</strong>.</p>
+            <p class="text-surface-600 text-sm leading-relaxed">Built in Python using <code class="font-mono text-xs bg-surface-100 px-1 py-0.5 rounded">urllib.parse</code> and regex (<code class="font-mono text-xs bg-surface-100 px-1 py-0.5 rounded">^(?:\d{1,3}\.){3}\d{1,3}$</code> for IP check, plus suspicious keyword matching for <code class="font-mono text-xs bg-surface-100 px-1 py-0.5 rounded">['login', 'verify', 'secure', 'account', 'update', 'signin', 'banking', 'confirm']</code>). Extracted across all 235,370 URLs in <strong>1.76 seconds</strong> (notebook run; machine-dependent) with <strong>0 NaNs</strong>.</p>
         </div>
 
         <!-- Summary Statistics Table -->
         <div class="card p-6 mb-8">
-            <h4 class="font-semibold text-surface-800 mb-4">Summary Statistics of 13 Extracted Features (235,370 rows)</h4>
+            <h4 class="font-semibold text-surface-800 mb-1">Descriptive Summary Statistics of 13 Extracted Features</h4>
+            <p class="text-xs text-surface-500 mb-4">Computed on the full deduplicated corpus (235,370 rows) for exploratory analysis only. Model scaling uses statistics from the 141,222-row training split alone.</p>
             <div class="overflow-x-auto rounded-xl border border-surface-200">
                 <table class="data-table">
                     <thead>
@@ -373,7 +392,7 @@
                         <tr><td class="font-mono text-xs">digit_count</td><td>1.88</td><td>11.90</td><td>0.0</td><td>2,011.0</td><td class="text-xs text-surface-500">Extreme outlier: 2,011 digits</td></tr>
                         <tr><td class="font-mono text-xs">digit_ratio</td><td>0.0283</td><td>0.0702</td><td>0.0</td><td>0.6842</td><td class="text-xs text-surface-500">Up to 68% digits in a URL</td></tr>
                         <tr><td class="font-mono text-xs">special_symbols</td><td>0.1614</td><td>1.9860</td><td>0.0</td><td>312.0</td><td class="text-xs text-surface-500">Counts @, ?, =, &amp;, %</td></tr>
-                        <tr><td class="font-mono text-xs">subdomain_count</td><td>1.16</td><td>0.60</td><td>0.0</td><td>10.0</td><td class="text-xs text-surface-500">Deeper subdomain nesting raises risk</td></tr>
+                        <tr><td class="font-mono text-xs">subdomain_count</td><td>1.16</td><td>0.60</td><td>0.0</td><td>10.0</td><td class="text-xs text-surface-500">Class means nearly identical (1.16 legit vs 1.17 phishing)</td></tr>
                         <tr class="bg-yellow-50"><td class="font-mono text-xs font-bold">uses_https</td><td class="font-bold">0.7806</td><td>0.4138</td><td>0.0</td><td>1.0</td><td class="text-xs text-yellow-700 font-semibold">78.06% of dataset uses HTTPS!</td></tr>
                         <tr><td class="font-mono text-xs">host_is_ip</td><td>0.0026</td><td>0.0507</td><td>0.0</td><td>1.0</td><td class="text-xs text-surface-500">Rare but strong phishing signal</td></tr>
                         <tr><td class="font-mono text-xs">suspicious_words</td><td>0.0330</td><td>0.2126</td><td>0.0</td><td>4.0</td><td class="text-xs text-surface-500">login, verify, secure, etc.</td></tr>
@@ -386,12 +405,21 @@
 
         <div class="grid md:grid-cols-2 gap-6 mb-8">
             <div class="card p-6 bg-yellow-50 border-yellow-200">
-                <h4 class="font-semibold text-yellow-800 mb-2">🔑 78.06% HTTPS Prevalence</h4>
-                <p class="text-sm text-yellow-700 leading-relaxed">Across the whole dataset (both classes combined), 78.06% of URLs use HTTPS, so checking for <code class="font-mono text-xs bg-yellow-100 px-1 py-0.5 rounded">https://</code> alone is unlikely to separate the classes without multivariate context. (Class-conditional HTTPS rates should be reported to confirm this.)</p>
+                <h4 class="font-semibold text-yellow-800 mb-2">🔑 HTTPS Prevalence &amp; Class-Conditioning</h4>
+                <p class="text-sm text-yellow-700 leading-relaxed">Across both classes 78.06% of URLs use HTTPS, but the split by class is stark: <strong>100% of legitimate URLs</strong> (134,850 of 134,850) use HTTPS versus <strong>48.63% of phishing URLs</strong>. Legitimate rows are also all bare <code class="font-mono text-xs bg-yellow-100 px-1 rounded">https://www.&lt;domain&gt;</code> addresses: none has a path, query string or special symbol, whereas 59.7% of phishing URLs have a path. A two-condition rule, <em>"flag if HTTP or has a path"</em>, already reaches <strong>99.04% accuracy, 97.76% recall and 0% false positives</strong> on the full corpus (computed in the repo notebook). This is a property of how the benchmark was built, not necessarily of real traffic; see Limitations.</p>
             </div>
             <div class="card p-6 bg-blue-50 border-blue-200">
                 <h4 class="font-semibold text-blue-800 mb-2">📊 Leak-Free Scaling Hygiene</h4>
                 <p class="text-sm text-blue-700 leading-relaxed">For Logistic Regression, <code class="font-mono text-xs bg-blue-100 px-1 py-0.5 rounded">StandardScaler</code> was fitted <strong>strictly on <code class="font-mono text-xs">X_train</code> (141,222 rows)</strong> and applied via <code class="font-mono text-xs bg-blue-100 px-1 py-0.5 rounded">.transform()</code> to <code class="font-mono text-xs">X_val</code> and <code class="font-mono text-xs">X_test</code>. Tree models used unscaled features since axis-aligned splits are invariant to monotonic linear scaling.</p>
+            </div>
+        </div>
+
+        <!-- EDA Chart -->
+        <div class="card p-6 mb-8">
+            <h4 class="font-semibold text-surface-800 mb-1">Feature Presence by Class</h4>
+            <p class="text-xs text-surface-500 mb-4">Percentage of URLs in each class where the property holds (full deduplicated corpus; computed from the working dataset in the repository).</p>
+            <div style="max-width:760px;margin:0 auto;">
+                <canvas id="edaChart" height="260" role="img" aria-label="Bar chart comparing the percentage of legitimate and phishing URLs that use HTTPS, have a path, contain special symbols, digits, hyphens, suspicious keywords, or an IP host."></canvas>
             </div>
         </div>
 
@@ -405,7 +433,7 @@
 
             <!-- URL Input -->
             <div class="flex gap-2 mb-4">
-                <input type="text" id="urlInput" placeholder="Enter any URL (e.g., https://example.com/login)" class="flex-1 px-4 py-3 border-2 border-surface-200 rounded-xl text-sm font-mono focus:outline-none focus:border-blue-500 transition" value="https://www.hannelore-kohl-stiftung.de">
+                <input type="text" aria-label="URL to analyse" id="urlInput" placeholder="Enter any URL (e.g., https://example.com/login)" class="flex-1 px-4 py-3 border-2 border-surface-200 rounded-xl text-sm font-mono focus:outline-none focus:border-blue-500 transition" value="https://www.hannelore-kohl-stiftung.de">
                 <button onclick="extractURLFeatures()" class="px-5 py-3 bg-blue-600 text-white rounded-xl font-semibold text-sm hover:bg-blue-700 transition">Analyze</button>
             </div>
 
@@ -483,7 +511,7 @@
             <div class="grid md:grid-cols-2 gap-6">
                 <div>
                     <div style="max-width:500px;">
-                        <canvas id="expAChart" height="300"></canvas>
+                        <canvas id="expAChart" height="300" role="img" aria-label="Bar chart of validation ROC-AUC with and without the suspicious columns"></canvas>
                     </div>
                 </div>
                 <div class="space-y-4">
@@ -529,7 +557,27 @@
                 </div>
             </div>
         </div>
-    </div>
+    
+        <div class="card p-6 mt-8">
+            <h4 class="font-semibold text-surface-800 mb-1">Baselines (test split, τ = 0.5 / fixed rules)</h4>
+            <p class="text-xs text-surface-500 mb-3">Computed in <code class="font-mono">final_analysis.py</code>. The rule has no fitted parameters but was written after inspecting class-conditional rates on the full corpus (Section 3), so it is a diagnostic baseline, not an independent one.</p>
+            <div class="overflow-x-auto rounded-xl border border-surface-200"><table class="data-table">
+                <thead><tr><th>Baseline</th><th>Accuracy</th><th>Phishing recall</th><th>FPR</th><th>Comment</th></tr></thead>
+                <tbody>
+                <tr><td class="font-semibold">Majority class (always “legitimate”)</td><td class="font-mono">57.29%</td><td class="font-mono">0.00%</td><td class="font-mono">0.00%</td><td class="text-xs text-surface-500">Accuracy is only the class prior; recall 0</td></tr>
+                <tr><td class="font-semibold">Rule: flag if HTTP <em>or</em> has a path</td><td class="font-mono">99.07%</td><td class="font-mono">97.82%</td><td class="font-mono">0.00%</td><td class="text-xs text-surface-500">439 phishing URLs missed, 0 false positives</td></tr>
+                </tbody></table></div>
+            <p class="text-sm text-surface-600 mt-3 leading-relaxed">Any model should be read against this: at τ = 0.5 the three learned models reach 99.38%–99.54% accuracy, versus 99.07% for a hand-written two-condition rule. Learned models add value mainly on the URLs the rule cannot separate (bare HTTPS roots).</p>
+        </div>
+        <div class="card p-6 mt-6">
+            <h4 class="font-semibold text-surface-800 mb-1">Hyper-parameter tuning (validation set only)</h4>
+            <p class="text-xs text-surface-500 mb-3">The Experiment B results above use library defaults, as in the notebook. As an additional experiment we tuned small grids on the validation set (LR: C ∈ {0.01, 0.1, 1, 10}; tree: depth × min_samples_leaf, 15 settings; forest: 4 settings) and evaluated each selected model once on the test set. Single seed, no confidence intervals.</p>
+            <div class="overflow-x-auto rounded-xl border border-surface-200"><table class="data-table">
+                <thead><tr><th>Model</th><th>Selected on validation</th><th>Test AUC, defaults</th><th>Test AUC, tuned</th></tr></thead>
+                <tbody><tr><td class="font-semibold">Logistic Regression</td><td class="font-mono text-xs">{"C": 0.1}</td><td class="font-mono">0.9961</td><td class="font-mono">0.9963</td></tr><tr><td class="font-semibold">Decision Tree</td><td class="font-mono text-xs">{"max_depth": 15, "min_samples_leaf": 20}</td><td class="font-mono">0.9948</td><td class="font-mono">0.9977</td></tr><tr><td class="font-semibold">Random Forest</td><td class="font-mono text-xs">{"n_estimators": 100, "max_depth": 20, "min_samples_leaf": 5}</td><td class="font-mono">0.9969</td><td class="font-mono">0.9976</td></tr></tbody></table></div>
+            <p class="text-sm text-surface-600 mt-3 leading-relaxed">The unpruned default tree overfits: constraining it lifts test AUC from 0.9948 to 0.9977, to the same level as the tuned forest (0.9976). So the default-model ranking in Experiment B partly reflects regularisation, not model family.</p>
+        </div>
+</div>
 </section>
 
 <!-- ===== SECTION 5: EVALUATION DESIGN ===== -->
@@ -580,7 +628,17 @@
                 </div>
             </div>
         </div>
-    </div>
+    
+        <div class="card p-6 mt-8">
+            <h4 class="font-semibold text-surface-800 mb-2">How uncertainty and robustness are assessed</h4>
+            <ul class="text-sm text-surface-600 leading-relaxed list-disc pl-5 space-y-1">
+                <li><strong>Selection vs final test:</strong> the validation set (47,074 rows) is used only for the threshold τ and the tuning grids. Each reported test number comes from a model fitted on the training split alone and scored once on the test split.</li>
+                <li><strong>Bootstrap:</strong> 1,000 paired resamples of the 47,074 test rows give 95% percentile intervals for ROC-AUC, for AUC differences between models, and for the RF’s recall, FPR and precision at τ. These capture test-sample noise only, not variation across splits or random seeds.</li>
+                <li><strong>Grouped re-split:</strong> a second split that never puts the same hostname in both train and test, to check for hostname memorisation.</li>
+                <li><strong>Ablations:</strong> dropping structural features, and scoring only the “hard” subset of bare HTTPS root URLs.</li>
+            </ul>
+        </div>
+</div>
 </section>
 
 <!-- ===== SECTION 6: RESULTS ===== -->
@@ -642,15 +700,29 @@
 
         <!-- H1 Interpretation -->
         <div class="card p-6 mb-8 bg-blue-50 border border-blue-200">
-            <h4 class="font-semibold text-blue-800 mb-2">Interpretation of Hypothesis H1</h4>
-            <p class="text-sm text-blue-700 leading-relaxed">Random Forest achieved the highest ROC-AUC (0.9969), Recall (0.9914), and F1-Score (0.9946), <strong>confirming Hypothesis H1</strong>. However, in an important nuance showing why <em>"more complex is not automatically better"</em>, simple Logistic Regression beat the single Decision Tree in both ROC-AUC (0.9961 vs 0.9948) and Precision (0.9991 vs 0.9976, making only <strong>17 false positives</strong>!).</p>
+            <h4 class="font-semibold text-blue-800 mb-2">Interpretation of Hypothesis H1 (tree ensembles outperform single trees and linear baselines)</h4>
+            <p class="text-sm text-blue-700 leading-relaxed">With default settings the Random Forest scored highest on this test split (ROC-AUC 0.9969). Bootstrap intervals show how much weight that deserves: its edge over the Decision Tree is clear (+0.0020, 95% CI +0.0015 to +0.0026), but its edge over Logistic Regression (+0.0007, CI +0.0000 to +0.0014) is at the edge of noise. So <strong>H1 is supported against the single tree and only weakly against the linear baseline</strong>. Simple Logistic Regression beat the default single tree (AUC 0.9961 vs 0.9948) and made the fewest false positives (17), which fits “more complex is not automatically better”. After validation-only tuning the tree catches up with the forest (Section 4), so we do not claim a model-family effect.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+            <div class="card p-6">
+                <h4 class="font-semibold text-surface-800 mb-1">Test ROC-AUC with 95% bootstrap CI</h4>
+                <p class="text-xs text-surface-500 mb-3">1,000 resamples of 47,074 test rows; default-setting models.</p>
+                <table class="data-table"><thead><tr><th>Model</th><th>AUC</th><th>95% CI</th></tr></thead><tbody><tr><td class="font-semibold">Logistic Regression</td><td class="font-mono">0.9961</td><td class="font-mono">[0.9955, 0.9968]</td></tr><tr><td class="font-semibold">Decision Tree</td><td class="font-mono">0.9948</td><td class="font-mono">[0.9939, 0.9957]</td></tr><tr><td class="font-semibold">Random Forest</td><td class="font-mono">0.9969</td><td class="font-mono">[0.9962, 0.9975]</td></tr></tbody></table>
+                <p class="text-xs text-surface-500 mt-3">Random Forest at τ = 0.0809: recall 95% CI [0.9922, 0.9944], FPR [0.0081, 0.0103], precision [0.9862, 0.9893]. So the “FPR ≤ 1%” constraint met on test has an upper interval end of 1.03%.</p>
+            </div>
+            <div class="card p-6">
+                <h4 class="font-semibold text-surface-800 mb-1">Paired AUC differences</h4>
+                <p class="text-xs text-surface-500 mb-3">Same resamples for each pair, so shared sampling noise cancels.</p>
+                <table class="data-table"><thead><tr><th>Difference</th><th>Mean</th><th>95% CI</th></tr></thead><tbody><tr><td class="font-semibold">Random Forest − Logistic Regression</td><td class="font-mono">+0.0007</td><td class="font-mono">[+0.0000, +0.0014]</td></tr><tr><td class="font-semibold">Random Forest − Decision Tree</td><td class="font-mono">+0.0020</td><td class="font-mono">[+0.0015, +0.0026]</td></tr><tr><td class="font-semibold">Logistic Regression − Decision Tree</td><td class="font-mono">+0.0013</td><td class="font-mono">[+0.0004, +0.0022]</td></tr></tbody></table>
+            </div>
         </div>
 
         <!-- Model Comparison Chart -->
         <div class="card p-6 mb-8">
             <h4 class="font-semibold text-surface-800 mb-4">Model Comparison (Zoomed y-axis: 0.980–1.000)</h4>
             <div style="max-width:700px;margin:0 auto;">
-                <canvas id="expBChart" height="340"></canvas>
+                <canvas id="expBChart" height="340" role="img" aria-label="Bar chart comparing test ROC-AUC, precision, recall and F1 for the three models"></canvas>
             </div>
         </div>
 
@@ -741,11 +813,12 @@
                     <label class="text-sm font-semibold text-surface-700">Decision Threshold $\tau$</label>
                     <span id="thresholdValue" class="font-mono text-lg font-bold text-blue-600">0.0809</span>
                 </div>
-                <input type="range" id="thresholdSlider" min="0.01" max="0.99" step="0.001" value="0.0809" oninput="updateThreshold(this.value)">
+                <input type="range" aria-label="Decision threshold tau for the Random Forest" id="thresholdSlider" min="0.01" max="0.99" step="0.001" value="0.0809" oninput="updateThreshold(this.value)">
                 <div class="flex justify-between text-xs text-surface-400 mt-1">
                     <span>0.01 (catch-all)</span>
                     <span>0.99 (ultra-strict)</span>
                 </div>
+                <p class="text-xs text-surface-500 mt-2">The slider snaps to the nearest of the 100 thresholds exported by the notebook (Random Forest, test set); every count shown is an exact value from <code class="font-mono">simulator_data.json</code>.</p>
             </div>
 
             <!-- Safety Badge -->
@@ -790,7 +863,8 @@
         </div>
 
         <!-- Error Analysis -->
-        <h3 class="text-xl font-bold text-surface-800 mb-4">Representative Error Analysis (Real Test Set Examples)</h3>
+        <h3 class="text-xl font-bold text-surface-800 mb-2">Representative Error Analysis (Real Test Set Examples)</h3>
+        <p class="text-sm text-surface-500 mb-4">These are the <strong>first five false positives and first five false negatives in test-set order</strong> (the notebook’s <code class="font-mono text-xs">.head(5)</code>), not hand-picked. The explanations beside each URL are our interpretation of its feature values; the aggregate tables below test those interpretations.</p>
 
         <div class="grid md:grid-cols-2 gap-6 mb-8">
             <!-- False Positives -->
@@ -850,21 +924,71 @@
             </div>
         </div>
 
-        <!-- Limitations -->
+        
+        <!-- ROBUSTNESS-EXPLORER -->
+        <div id="robust" class="card p-8 mb-8 border-2 border-indigo-200">
+            <div class="flex items-center gap-3 mb-2"><span class="text-2xl">🧪</span>
+            <h3 class="text-xl font-bold text-surface-800">Interactive: How Robust Is the Headline Score?</h3></div>
+            <p class="text-sm text-surface-600 mb-4">Pick a stress test to see how test ROC-AUC changes. All values come from <code class="font-mono text-xs">results/final_results.json</code>, written by <code class="font-mono text-xs">final_analysis.py</code> in the repository.</p>
+            <div id="robustButtons" class="flex flex-wrap gap-2 mb-4" role="tablist" aria-label="Robustness scenarios"></div>
+            <div id="robustPanel" class="rounded-xl border border-indigo-100 bg-indigo-50/50 p-4" aria-live="polite"></div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+            <div class="card p-6">
+                <h4 class="font-semibold text-surface-800 mb-1">False positives by feature bucket (τ = 0.0809)</h4>
+                <p class="text-xs text-surface-500 mb-3">Over all 26,970 legitimate test URLs.</p>
+                <table class="data-table"><thead><tr><th>Hostname length</th><th>Legit URLs</th><th>FP</th><th>FPR</th></tr></thead><tbody><tr><td>&lt;=15</td><td class="font-mono">6,421</td><td class="font-mono">21</td><td class="font-mono">0.33%</td></tr><tr><td>16-25</td><td class="font-mono">17,824</td><td class="font-mono">82</td><td class="font-mono">0.46%</td></tr><tr><td>&gt;25</td><td class="font-mono">2,725</td><td class="font-mono">145</td><td class="font-mono">5.32%</td></tr></tbody></table>
+                <table class="data-table mt-4"><thead><tr><th>Hyphens in host</th><th>Legit URLs</th><th>FP</th><th>FPR</th></tr></thead><tbody><tr><td>no hyphen</td><td class="font-mono">24,974</td><td class="font-mono">128</td><td class="font-mono">0.51%</td></tr><tr><td>&gt;=1 hyphen</td><td class="font-mono">1,996</td><td class="font-mono">120</td><td class="font-mono">6.01%</td></tr></tbody></table>
+                <p class="text-xs text-surface-600 mt-3 leading-relaxed">Long and hyphenated hostnames are blocked far more often than short ones, which supports our reading of the sample false positives above (long compound names such as German foundations).</p>
+            </div>
+            <div class="card p-6">
+                <h4 class="font-semibold text-surface-800 mb-1">Where the false negatives are</h4>
+                <p class="text-sm text-surface-600 leading-relaxed mb-2">At τ = 0.0809 the model misses 134 phishing URLs; at τ = 0.5 it misses 172. <strong>All of them have HTTPS and no path</strong>: the form every legitimate URL in this benchmark takes. Only 439 of the 20,104 test phishing URLs look like that, so 134/439 = 30.5% of them are missed at the tuned τ.</p>
+                <p class="text-sm text-surface-600 leading-relaxed mb-2"><strong>Shared hosting:</strong> 5,331 of the test phishing URLs (26.5%) sit on shared platforms (public-suffix private domains such as repl.co or pantheonsite.io). 32 of the 134 misses are on such platforms (top: repl.co (17), pantheonsite.io (3), web.app (2), pages.dev (2), webflow.io (1)), but the platform miss rate (0.60%) is not higher than for other phishing (0.69%). So in this benchmark shared hosting is <em>not</em> a measurably harder case.</p>
+                <p class="text-xs text-surface-500">The test set holds only 26 legitimate URLs on shared platforms, so we cannot say how the model treats legitimate sites hosted there.</p>
+            </div>
+        </div>
+        <div class="card p-6 mb-8">
+            <h4 class="font-semibold text-surface-800 mb-1">Calibration of the Random Forest scores (test set)</h4>
+            <p class="text-xs text-surface-500 mb-3">Expected calibration error 0.0008, Brier score 0.0041. Measured on the benchmark (about 43% phishing); it says nothing about calibration at the 1% or 0.1% prevalence discussed under Deployment Risk.</p>
+            <div class="overflow-x-auto rounded-xl border border-surface-200"><table class="data-table">
+                <thead><tr><th>Score bin</th><th>URLs</th><th>Mean score</th><th>Observed phishing share</th></tr></thead>
+                <tbody><tr><td class="font-mono">0.0-0.1</td><td class="font-mono">26,894</td><td class="font-mono">0.005</td><td class="font-mono">0.005</td></tr><tr><td class="font-mono">0.1-0.2</td><td class="font-mono">91</td><td class="font-mono">0.151</td><td class="font-mono">0.154</td></tr><tr><td class="font-mono">0.2-0.3</td><td class="font-mono">58</td><td class="font-mono">0.251</td><td class="font-mono">0.207</td></tr><tr><td class="font-mono">0.3-0.4</td><td class="font-mono">26</td><td class="font-mono">0.339</td><td class="font-mono">0.115</td></tr><tr><td class="font-mono">0.4-0.5</td><td class="font-mono">30</td><td class="font-mono">0.458</td><td class="font-mono">0.267</td></tr><tr><td class="font-mono">0.5-0.6</td><td class="font-mono">15</td><td class="font-mono">0.549</td><td class="font-mono">0.533</td></tr><tr><td class="font-mono">0.6-0.7</td><td class="font-mono">27</td><td class="font-mono">0.634</td><td class="font-mono">0.444</td></tr><tr><td class="font-mono">0.7-0.8</td><td class="font-mono">16</td><td class="font-mono">0.749</td><td class="font-mono">0.500</td></tr><tr><td class="font-mono">0.8-0.9</td><td class="font-mono">14</td><td class="font-mono">0.855</td><td class="font-mono">0.643</td></tr><tr><td class="font-mono">0.9-1.0</td><td class="font-mono">19,903</td><td class="font-mono">1.000</td><td class="font-mono">1.000</td></tr></tbody>
+            </table></div>
+            <p class="text-xs text-surface-600 mt-3 leading-relaxed">The scores are well calibrated on this split, but the middle bins hold few URLs (15–91 each), so their observed shares are noisy. Almost every URL falls in the first or last bin.</p>
+        </div>
+<!-- Limitations -->
         <div class="card p-6">
             <h4 class="font-semibold text-surface-800 mb-4">Limitations &amp; Risks</h4>
             <div class="grid md:grid-cols-3 gap-4 mb-4">
                 <div class="p-4 bg-surface-50 rounded-xl border-t-4 border-red-400">
                     <h5 class="font-semibold text-sm text-surface-800 mb-2">Free Cloud / PaaS Subdomain Blindspot</h5>
-                    <p class="text-xs text-surface-600 leading-relaxed">Attackers hosting phishing kits on legitimate cloud platforms (<code class="font-mono text-xs">repl.co</code>, <code class="font-mono text-xs">pantheonsite.io</code>, <code class="font-mono text-xs">github.io</code>, <code class="font-mono text-xs">vercel.app</code>) inherit clean domain structures and valid HTTPS certificates.</p>
+                    <p class="text-xs text-surface-600 leading-relaxed">26.5% of test phishing sits on shared platforms (repl.co, pantheonsite.io, …). They are missed no more often than other phishing (0.60% vs 0.69% at τ = 0.0809), but the test set has only 26 legitimate shared-hosted URLs, so the reverse risk (blocking legitimate sites hosted there) is untestable here.</p>
                 </div>
                 <div class="p-4 bg-surface-50 rounded-xl border-t-4 border-yellow-400">
                     <h5 class="font-semibold text-sm text-surface-800 mb-2">Lack of Character Entropy / N-gram Modeling</h5>
-                    <p class="text-xs text-surface-600 leading-relaxed">Random gibberish domains (<code class="font-mono text-xs">smcbacmzu.icu</code>) pass basic length/digit checks if they contain only lowercase letters; adding Shannon entropy or character bigram probabilities would help catch these.</p>
+                    <p class="text-xs text-surface-600 leading-relaxed">We tested two extra features (hostname entropy and longest consonant run). Random Forest test ROC-AUC moved from 0.9969 to 0.9978 (single run, no CI). We kept the 13-feature set as the main result and report this as an extra experiment.</p>
                 </div>
                 <div class="p-4 bg-surface-50 rounded-xl border-t-4 border-blue-400">
                     <h5 class="font-semibold text-sm text-surface-800 mb-2">Dataset Construction Bias</h5>
-                    <p class="text-xs text-surface-600 leading-relaxed">In PhiUSIIL, legitimate URLs are predominantly root domains with <code class="font-mono text-xs">https://www.</code>, while many phishing URLs have long paths or missing HTTPS. A model trained on this benchmark can over-rely on <code class="font-mono text-xs">uses_https</code> and <code class="font-mono text-xs">path_len_ratio</code> unless verified on external traffic.</p>
+                    <p class="text-xs text-surface-600 leading-relaxed">All 26,970 legitimate test URLs (and all 134,850 in the corpus) use HTTPS and have no path, query or special symbol, while 59.7% of phishing URLs have a path. The model can therefore lean on URL structure rather than phishing-specific cues; on bare HTTPS roots its AUC is 0.857. Results may not transfer to real browsing traffic, which contains legitimate URLs with paths.</p>
+                </div>
+                <div class="p-4 bg-surface-50 rounded-xl border-t-4 border-purple-400">
+                    <h5 class="font-semibold text-sm text-surface-800 mb-2">URL-Level vs. Domain-Level Splitting</h5>
+                    <p class="text-xs text-surface-600 leading-relaxed">7.7% of test URLs share a hostname with training URLs (18.0% of phishing, 0.04% of legitimate). A hostname-grouped re-split gives Random Forest AUC 0.9968 (LR 0.9958, DT 0.9956), so memorisation is not driving the score. We grouped by hostname, not by registered domain.</p>
+                </div>
+                <div class="p-4 bg-surface-50 rounded-xl border-t-4 border-teal-400">
+                    <h5 class="font-semibold text-sm text-surface-800 mb-2">Naive TLD Parsing</h5>
+                    <p class="text-xs text-surface-600 leading-relaxed">The extractor splits the hostname on dots. This mishandles two-part country-code suffixes (e.g. <code class="font-mono text-xs">.com.br</code> is read as TLD <code class="font-mono text-xs">br</code> plus subdomain <code class="font-mono text-xs">com</code>), slightly distorting <code class="font-mono text-xs">tld_length</code> and <code class="font-mono text-xs">subdomain_count</code>.</p>
+                </div>
+                <div class="p-4 bg-surface-50 rounded-xl border-t-4 border-orange-400">
+                    <h5 class="font-semibold text-sm text-surface-800 mb-2">One dataset, one seed</h5>
+                    <p class="text-xs text-surface-600 leading-relaxed">All results come from a single benchmark and a single split seed (42). The bootstrap intervals capture test-sample noise only, not split or seed variation, and the tuned and extra-feature results are single runs.</p>
+                </div>
+                <div class="p-4 bg-surface-50 rounded-xl border-t-4 border-pink-400">
+                    <h5 class="font-semibold text-sm text-surface-800 mb-2">Ablation is not a clean removal</h5>
+                    <p class="text-xs text-surface-600 leading-relaxed">Dropping the three structure columns still leaves url_length and hostname_length, whose difference reveals whether a path or query exists. The ablation therefore shows sensitivity, not independence from path information.</p>
                 </div>
             </div>
 
@@ -888,7 +1012,7 @@
                     <div class="my-2 p-2 bg-white/80 rounded border border-amber-200 text-center font-mono text-xs text-amber-900 overflow-x-auto">
                         $$\text{PPV}(\pi) = \frac{\text{TPR} \cdot \pi}{\text{TPR} \cdot \pi + \text{FPR} \cdot (1 - \pi)}$$
                     </div>
-                    <p class="text-xs text-amber-950/80 leading-relaxed">At $\text{TPR} = 99.33\%$ and $\text{FPR} = 0.92\%$, dropping prevalence to $\pi = 1\%$ collapses Precision to <strong>$\sim 52.3\%$</strong> (about 1 false alarm for every phishing URL caught). At $\pi = 0.1\%$, Precision plunges below <strong>$9.8\%$</strong>. A stricter operating point largely fixes this: on our test set, $\tau = 0.90$ gives $\text{TPR} = 98.96\%$ at $\text{FPR} \approx 0.030\%$ (8 false positives), which keeps Precision near <strong>$\sim 97\%$</strong> at $\pi = 1\%$ and about <strong>$77\%$</strong> at $\pi = 0.1\%$. Production browser filters therefore need much stricter operating points than the validation-tuned $\tau = 0.0809$ to avoid user alert fatigue.</p>
+                    <p class="text-xs text-amber-950/80 leading-relaxed">At $\text{TPR} = 99.33\%$ and $\text{FPR} = 0.92\%$, dropping prevalence to $\pi = 1\%$ collapses Precision to <strong>$\sim 52.2\%$</strong> (about 1 false alarm for every phishing URL caught). At $\pi = 0.1\%$, Precision plunges to <strong>$\sim 9.8\%$</strong>. A stricter operating point largely fixes this: on our test set, $\tau = 0.90$ gives $\text{TPR} = 98.96\%$ at $\text{FPR} \approx 0.030\%$ (8 false positives), which keeps Precision near <strong>$\sim 97\%$</strong> at $\pi = 1\%$ and about <strong>$77\%$</strong> at $\pi = 0.1\%$. Production browser filters therefore need much stricter operating points than the validation-tuned $\tau = 0.0809$ to avoid user alert fatigue.</p>
                 </div>
             </div>
         </div>
@@ -906,18 +1030,18 @@
         <div class="grid md:grid-cols-3 gap-6">
             <div class="card p-6 border-t-4 border-blue-500">
                 <div class="text-3xl mb-3">🛡️</div>
-                <h4 class="font-bold text-surface-800 mb-2">Zero-Packet Features Are Highly Effective</h4>
-                <p class="text-sm text-surface-600 leading-relaxed">With <strong>0.9969 ROC-AUC</strong> using Random Forest and <strong>1.55s extraction</strong> for 235k URLs, lexical URL features provide a fast first line of defense before any network packet is sent. At the tuned threshold, the model catches <strong>99.33% of phishing URLs</strong> while blocking only <strong>0.92%</strong> of legitimate traffic.</p>
+                <h4 class="font-bold text-surface-800 mb-2">URL-only features separate this benchmark well, with caveats</h4>
+                <p class="text-sm text-surface-600 leading-relaxed">On the benchmark test split Random Forest reaches ROC-AUC <strong>0.9969</strong> (95% CI 0.9962–0.9975), and the score survives a hostname-grouped split (0.9968). But a two-condition rule already reaches 99.07% accuracy, and on bare HTTPS roots the forest’s AUC is 0.857. We conclude that lexical features are informative, but this benchmark overstates how easy the problem is.</p>
             </div>
             <div class="card p-6 border-t-4 border-red-500">
                 <div class="text-3xl mb-3">🔍</div>
-                <h4 class="font-bold text-surface-800 mb-2">Benchmark Auditing Is Mandatory</h4>
-                <p class="text-sm text-surface-600 leading-relaxed">Public cybersecurity datasets can harbor severe feature leakage: <code class="font-mono text-xs bg-red-100 px-1 py-0.5 rounded">URLSimilarityIndex</code> achieves <strong>0.9959 Validation AUC alone</strong> (0.9961 on train), distorting published leaderboard claims. Studies using PhiUSIIL can report inflated results if the availability of these columns at inference time is not checked.</p>
+                <h4 class="font-bold text-surface-800 mb-2">Check feature availability at prediction time</h4>
+                <p class="text-sm text-surface-600 leading-relaxed"><code class="font-mono text-xs bg-red-100 px-1 py-0.5 rounded">URLSimilarityIndex</code> alone reaches <strong>0.9959 validation AUC</strong>, and adding it plus <code class="font-mono text-xs">TLDLegitimateProb</code> lifts validation AUC to 0.9999 for both Logistic Regression and Decision Tree. These columns need an offline reference list, which a browser does not have at click-time, so we exclude them. This is a feature-availability problem rather than label leakage. We did not check any published paper, so we make no claim about other studies.</p>
             </div>
             <div class="card p-6 border-t-4 border-green-500">
                 <div class="text-3xl mb-3">⚙️</div>
-                <h4 class="font-bold text-surface-800 mb-2">Threshold Calibration Bridges ML &amp; Deployment</h4>
-                <p class="text-sm text-surface-600 leading-relaxed">Tuning the decision threshold on a validation set allows operators to target a false-alarm budget (observed test $\text{FPR} = 0.92\%$) while retaining <strong>99.33% phishing recall</strong>. This turns a raw ML model into a candidate security filter whose operating constraint was met on the held-out test set (an observed result, not a deployment guarantee).</p>
+                <h4 class="font-bold text-surface-800 mb-2">Choose the operating point for deployment, not the benchmark</h4>
+                <p class="text-sm text-surface-600 leading-relaxed">The validation-tuned τ = 0.0809 met FPR ≤ 1% on test (observed 0.92%, 95% CI up to 1.03%), but at 1% phishing prevalence its precision would be about 52%. A stricter τ = 0.90 gives TPR 98.96% at FPR 0.030% and about 97% precision at 1% prevalence. These are observed results on this benchmark, not deployment guarantees.</p>
             </div>
         </div>
     </div>
@@ -931,7 +1055,34 @@
             <h2 class="text-2xl lg:text-3xl font-bold text-surface-900">Reproducibility &amp; Technical Integrity</h2>
         </div>
 
-        <p class="text-surface-600 text-sm mb-6 leading-relaxed">Below is a complete step-by-step guide to reproduce all results. Every code snippet is copyable.</p>
+        <p class="text-surface-600 text-sm mb-6 leading-relaxed">Everything on this page can be regenerated from the repository. The run order comes first; the copyable snippets below cover the core pipeline.</p>
+        <div class="card p-6 mb-6 border-l-4 border-green-500 bg-green-50">
+            <h4 class="font-semibold text-green-900 mb-3">Run order and where each result comes from</h4>
+            <ol class="text-sm text-green-900/90 list-decimal pl-5 space-y-1">
+                <li><code class="font-mono text-xs">pip install -r requirements.txt</code> (Python 3.10+).</li>
+                <li>Place <code class="font-mono text-xs">phiusiil_phishing.csv</code> in the repository root (included in the repo; or re-download with <code class="font-mono text-xs">ucimlrepo</code>, ID 967).</li>
+                <li>Run <code class="font-mono text-xs">audit.ipynb</code> top to bottom: dataset checks, 55-column audit, feature extraction, Experiments A, B and C, error samples; it writes <code class="font-mono text-xs">phiusiil_working_dataset.csv</code> and <code class="font-mono text-xs">simulator_data.json</code>.</li>
+                <li>Run <code class="font-mono text-xs">python final_analysis.py</code>: re-derives the notebook numbers (and stops with an error if they differ), then adds baselines, bootstrap intervals, tuning, the grouped split, ablations, error breakdowns and calibration. It writes <code class="font-mono text-xs">results/final_results.json</code> and a log. Runtime is roughly 10–15 minutes on one CPU core.</li>
+            </ol>
+            <div class="overflow-x-auto rounded-xl border border-green-200 mt-4 bg-white"><table class="data-table">
+                <thead><tr><th>On this page</th><th>Produced by</th></tr></thead>
+                <tbody>
+                <tr><td>Sections 2–3: counts, duplicates, feature table, 55-column audit</td><td class="text-xs">audit.ipynb; dataset_column_audit.csv; class-conditional rates in final_analysis.py</td></tr>
+                <tr><td>Experiment A (validation AUC with and without the two columns)</td><td class="text-xs">audit.ipynb</td></tr>
+                <tr><td>Experiment B table, confusion matrices, Experiment C threshold, slider and error samples</td><td class="text-xs">audit.ipynb; slider data = simulator_data.json (100 exported thresholds)</td></tr>
+                <tr><td>Baselines, tuning, bootstrap CIs, grouped split, ablations, extra features, error breakdown, calibration, prevalence-adjusted precision, robustness explorer</td><td class="text-xs">final_analysis.py → results/final_results.json</td></tr>
+                <tr><td>URL extractor panel (coefficients and scaler statistics)</td><td class="text-xs">Logistic Regression fitted on the 141,222-row training split with the notebook’s split; embedded in the page as <code class="font-mono">LR_PARAMS</code></td></tr>
+                </tbody></table></div>
+        </div>
+        <div class="card p-6 mb-6 border-l-4 border-amber-400 bg-amber-50">
+            <h4 class="font-semibold text-amber-900 mb-2">Known caveats about the code snippets below</h4>
+            <ul class="text-sm text-amber-900/90 list-disc pl-5 space-y-1">
+                <li>The snippets cover data loading, feature extraction, the split, scaling and threshold selection. The model comparison, Experiment A and all extra analyses are in <code class="font-mono text-xs">audit.ipynb</code> and <code class="font-mono text-xs">final_analysis.py</code>.</li>
+                <li>The notebook’s prose says “12 features” in places; the code extracts and uses 13 (listed in Section 3).</li>
+                <li>The 1.76 s extraction time is from one notebook run on the author’s machine and varies by hardware.</li>
+            </ul>
+        </div>
+
 
         <!-- Step 1: Environment -->
         <div class="card p-6 mb-6">
@@ -1062,6 +1213,16 @@ best_idx = valid_idx[np.<span class="func">argmax</span>(tpr[valid_idx])]
 tuned_threshold = thresholds[best_idx]
 <span class="keyword">print</span>(<span class="string">f"Tuned τ = </span>{tuned_threshold:.4f}<span class="string">"</span>)  <span class="comment"># 0.0809</span></code></div>
         </div>
+    
+        <!-- Team & Disclosure -->
+        <div class="card p-6 mt-8 border-l-4 border-blue-500 bg-blue-50">
+            <h4 class="font-semibold text-blue-900 mb-3">Project Authors &amp; Disclosures</h4>
+            <div class="space-y-3">
+                <p class="text-sm text-blue-800"><strong>Authors:</strong> Kangeti laxmi narayana Murthi (GitHub: klnmurthi12345) & Golla Gowtham Surya (GitHub: Gowthamsuryagolla)</p>
+                <p class="text-sm text-blue-800"><strong>Code &amp; data:</strong> <a class="underline" href="https://github.com/klnmurthi12345/Zero-Packet-Phishers-" target="_blank" rel="noopener">github.com/klnmurthi12345/Zero-Packet-Phishers-</a></p>
+                <p class="text-sm text-blue-800"><strong>AI-Use Disclosure:</strong> All core data science, model development, and analysis were independently performed by us. We utilized generative AI (Google Gemini and Anthropic Claude) solely as a productivity tool to accelerate standard UI boilerplate (HTML/Tailwind layout, Chart.js setup), assist with minor debugging, and cross-check our final site against the rubric. We manually validated all metrics—including our exact test ROC-AUC and confusion matrices—and take full responsibility for every result presented on this page.</p><p class="text-sm text-blue-800"><strong>Dataset Citation:</strong> Prasad, A., &amp; Chandra, S. (2024). PhiUSIIL: A diverse security profile empowered phishing URL detection framework based on similarity index and incremental learning. <em>Computers &amp; Security</em>, 136, 103545. Obtained from the UCI Machine Learning Repository (dataset ID 967).</p>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -1077,7 +1238,7 @@ tuned_threshold = thresholds[best_idx]
         <p class="text-sm mb-2">ES 335 · Machine Learning · Undergraduate Course Project</p>
         <p class="text-xs text-surface-500">Dataset: UCI PhiUSIIL Phishing URL Dataset (ID 967) · 235,370 URLs · 13 Lexical Features · Random Forest AUC 0.9969</p>
         <div class="mt-4 h-px bg-surface-700 max-w-md mx-auto"></div>
-        <p class="text-xs text-surface-600 mt-4">Built with HTML5, Tailwind CSS, Chart.js &amp; vanilla JavaScript. Deployed on GitHub Pages.</p>
+        <p class="text-xs text-surface-600 mt-4">Built with HTML5, Tailwind CSS, Chart.js &amp; vanilla JavaScript. Deployed on GitHub Pages. <a class="underline" href="https://github.com/klnmurthi12345/Zero-Packet-Phishers-" target="_blank" rel="noopener">Source repository</a>. Dataset: Prasad &amp; Chandra (2024), <em>Computers &amp; Security</em> 136:103545.</p>
     </div>
 </footer>
 
@@ -1197,6 +1358,7 @@ const datasetStats = {
     tld_length: {mean:2.76, std:0.60},
 };
 
+const LR_PARAMS = {"w": {"url_length": 4.5967, "hostname_length": 0.5538, "dot_count": 1.5172, "hyphen_count": 0.6372, "digit_count": 0.4849, "digit_ratio": 1.6734, "special_symbols": 1.8087, "subdomain_count": -1.0532, "uses_https": -13.2728, "host_is_ip": -0.8293, "suspicious_words": 0.5937, "path_len_ratio": 33.8039, "tld_length": 0.0053}, "b": 15.8383, "mean": {"url_length": 35.3613, "hostname_length": 21.4588, "dot_count": 2.257, "hyphen_count": 0.2803, "digit_count": 1.8841, "digit_ratio": 0.0281, "special_symbols": 0.1644, "subdomain_count": 1.1649, "uses_https": 0.7799, "host_is_ip": 0.0026, "suspicious_words": 0.0327, "path_len_ratio": 0.0499, "tld_length": 2.7661}, "std": {"url_length": 42.4252, "hostname_length": 9.1771, "dot_count": 0.9472, "hyphen_count": 0.7536, "digit_count": 12.8238, "digit_ratio": 0.07, "special_symbols": 2.1606, "subdomain_count": 0.6009, "uses_https": 0.4143, "host_is_ip": 0.0511, "suspicious_words": 0.2104, "path_len_ratio": 0.1474, "tld_length": 0.6002}};  // Logistic Regression fitted on the 141,222-row training split (StandardScaler stats + coefficients); regenerate via notebook
 const SUSPICIOUS_TOKENS = ['login','verify','secure','account','update','signin','banking','confirm'];
 const IP_REGEX = /^(?:\d{1,3}\.){3}\d{1,3}$/;
 
@@ -1212,7 +1374,10 @@ function extractFeaturesJS(urlStr) {
     let a;
     try { a = new URL(parseUrl); } catch(e) { a = {hostname:'',pathname:''}; }
     const hostname = a.hostname || '';
-    const path = a.pathname || '';
+    // Match Python urlparse: path starts at first '/' after the host, excluding query/fragment
+    const _rest = parseUrl.replace(/^https?:\/\//i,'');
+    const _ps = _rest.search(/[\/?#]/);
+    const path = (_ps >= 0 && _rest[_ps] === '/') ? _rest.slice(_ps).split(/[?#]/)[0] : '';
     const url_length = urlStr.length;
     const hostname_length = hostname.length;
     const dot_count = (urlStr.match(/\./g)||[]).length;
@@ -1243,11 +1408,14 @@ function extractURLFeatures() {
     const container = document.getElementById('urlFeatureOutput');
     container.innerHTML = '';
     const featureNames = Object.keys(datasetStats);
+    let logOdds = LR_PARAMS.b;
     featureNames.forEach(name => {
         const val = feats[name];
         const stat = datasetStats[name];
         const zscore = stat.std > 0 ? (val - stat.mean) / stat.std : 0;
         const absZ = Math.abs(zscore);
+        const lrStd = LR_PARAMS.std[name];
+        logOdds += LR_PARAMS.w[name] * ((val - LR_PARAMS.mean[name]) / lrStd);
         let statusColor = 'bg-green-100 text-green-700 border-green-200';
         let statusText = 'Normal';
         if(absZ > 2) { statusColor = 'bg-red-100 text-red-700 border-red-200'; statusText = 'Anomalous'; }
@@ -1264,24 +1432,39 @@ function extractURLFeatures() {
         </div>`;
     });
 
+    const lrProb = 1 / (1 + Math.exp(-logOdds));
+
     // Explanation
     const expDiv = document.getElementById('urlExplanation');
     expDiv.classList.remove('hidden');
     let reasons = [];
     if(feats.uses_https === 0) reasons.push('❌ Does not use HTTPS — strong phishing signal in our dataset.');
-    if(feats.uses_https === 1) reasons.push('✅ Uses HTTPS — but 78% of all URLs (including phishing) do, so this alone is insufficient.');
+    if(feats.uses_https === 1) reasons.push('✅ Uses HTTPS. In this dataset 100% of legitimate and 48.6% of phishing URLs do, so HTTPS alone cannot rule out phishing.');
     if(feats.hostname_length > 25) reasons.push(`⚠️ Long hostname (${feats.hostname_length} chars) — may resemble brand-spoofing domains.`);
     if(feats.hyphen_count >= 2) reasons.push(`⚠️ Multiple hyphens in hostname (${feats.hyphen_count}) — common in phishing domains mimicking legitimate brands.`);
     if(feats.digit_count > 5) reasons.push(`⚠️ High digit count (${feats.digit_count}) — often seen in URL-encoded phishing payloads.`);
     if(feats.host_is_ip === 1) reasons.push('🚩 Hostname is a raw IP address — strong phishing indicator.');
     if(feats.suspicious_words > 0) reasons.push(`🚩 Contains ${feats.suspicious_words} suspicious keyword(s) (login, verify, secure, etc.).`);
-    if(feats.subdomain_count >= 3) reasons.push(`⚠️ Deep subdomain nesting (${feats.subdomain_count} subdomains) — may be hiding true domain.`);
+    if(feats.subdomain_count >= 3) reasons.push(`⚠️ Deep subdomain nesting (${feats.subdomain_count} subdomains) — (class means are nearly identical in this dataset, so this signal is weak).`);
     if(feats.path_len_ratio > 0.5) reasons.push(`⚠️ Long path relative to URL (${(feats.path_len_ratio*100).toFixed(1)}%) — may contain encoded phishing payloads.`);
     if(feats.url_length < 25 && feats.uses_https === 1 && feats.hyphen_count === 0 && feats.suspicious_words === 0) reasons.push('✅ Short, clean URL with HTTPS — would likely be classified as legitimate by our model. However, this pattern is also used by sophisticated phishing attacks on cloud PaaS platforms.');
     if(feats.tld_length > 3) reasons.push(`ℹ️ Uncommon TLD length (${feats.tld_length} chars) — diverges from standard .com/.org/.de patterns.`);
     if(reasons.length === 0) reasons.push('ℹ️ No strong lexical anomalies detected. This URL has a typical legitimate profile under our 13-feature model.');
 
-    expDiv.innerHTML = `<h4 class="font-semibold text-surface-800 mb-2">🔍 Risk Analysis</h4><ul class="space-y-1">${reasons.map(r => `<li class="text-sm text-surface-600">${r}</li>`).join('')}</ul>`;
+    const isPhish = lrProb > 0.5;
+    const badge = isPhish ? 'bg-red-100 text-red-800 border-red-200' : 'bg-green-100 text-green-800 border-green-200';
+    const probBox = `
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 p-4 border rounded-xl ${badge}">
+        <div>
+            <h4 class="font-bold text-lg mb-1">Logistic Regression baseline: P(phishing)</h4>
+            <p class="text-xs">Trained on the 141,222-row training split (z-scored with training statistics), evaluated here with the real fitted coefficients. This is the baseline model (test ROC-AUC 0.9961), not the Random Forest. Threshold 0.5.</p>
+        </div>
+        <div class="text-right mt-2 md:mt-0">
+            <div class="text-3xl font-black">${(lrProb * 100).toFixed(2)}%</div>
+            <div class="text-xs font-bold uppercase tracking-wider">${isPhish ? 'Likely Phishing' : 'Likely Legitimate'}</div>
+        </div>
+    </div>`;
+    expDiv.innerHTML = probBox + `<h4 class="font-semibold text-surface-800 mb-2">🔍 Risk Analysis</h4><ul class="space-y-1">${reasons.map(r => `<li class="text-sm text-surface-600">${r}</li>`).join('')}</ul>`;
 }
 
 // Run on page load
@@ -1306,7 +1489,7 @@ const anchorPoints = [
     {tau:0.08, tn:26717, fp:253, fn:134, tp:19970},
     {tau:0.0809, tn:26722, fp:248, fn:134, tp:19970},
     {tau:0.09, tn:26741, fp:229, fn:135, tp:19969},
-    {tau:0.10, tn:26759, fp:211, fn:135, tp:19969},
+    {tau:0.1, tn:26759, fp:211, fn:135, tp:19969},
     {tau:0.11, tn:26762, fp:208, fn:136, tp:19968},
     {tau:0.12, tn:26775, fp:195, fn:139, tp:19965},
     {tau:0.13, tn:26779, fp:191, fn:140, tp:19964},
@@ -1316,7 +1499,7 @@ const anchorPoints = [
     {tau:0.17, tn:26813, fp:157, fn:142, tp:19962},
     {tau:0.18, tn:26821, fp:149, fn:144, tp:19960},
     {tau:0.19, tn:26832, fp:138, fn:148, tp:19956},
-    {tau:0.20, tn:26836, fp:134, fn:149, tp:19955},
+    {tau:0.2, tn:26836, fp:134, fn:149, tp:19955},
     {tau:0.21, tn:26839, fp:131, fn:150, tp:19954},
     {tau:0.22, tn:26844, fp:126, fn:152, tp:19952},
     {tau:0.23, tn:26854, fp:116, fn:153, tp:19951},
@@ -1326,7 +1509,7 @@ const anchorPoints = [
     {tau:0.27, tn:26867, fp:103, fn:154, tp:19950},
     {tau:0.28, tn:26871, fp:99, fn:155, tp:19949},
     {tau:0.29, tn:26880, fp:90, fn:157, tp:19947},
-    {tau:0.30, tn:26882, fp:88, fn:161, tp:19943},
+    {tau:0.3, tn:26882, fp:88, fn:161, tp:19943},
     {tau:0.31, tn:26885, fp:85, fn:162, tp:19942},
     {tau:0.32, tn:26890, fp:80, fn:162, tp:19942},
     {tau:0.33, tn:26892, fp:78, fn:162, tp:19942},
@@ -1336,7 +1519,7 @@ const anchorPoints = [
     {tau:0.37, tn:26901, fp:69, fn:164, tp:19940},
     {tau:0.38, tn:26901, fp:69, fn:164, tp:19940},
     {tau:0.39, tn:26901, fp:69, fn:164, tp:19940},
-    {tau:0.40, tn:26905, fp:65, fn:164, tp:19940},
+    {tau:0.4, tn:26905, fp:65, fn:164, tp:19940},
     {tau:0.41, tn:26905, fp:65, fn:164, tp:19940},
     {tau:0.42, tn:26909, fp:61, fn:165, tp:19939},
     {tau:0.43, tn:26910, fp:60, fn:165, tp:19939},
@@ -1346,7 +1529,7 @@ const anchorPoints = [
     {tau:0.47, tn:26921, fp:49, fn:167, tp:19937},
     {tau:0.48, tn:26926, fp:44, fn:169, tp:19935},
     {tau:0.49, tn:26927, fp:43, fn:171, tp:19933},
-    {tau:0.50, tn:26927, fp:43, fn:172, tp:19932},
+    {tau:0.5, tn:26927, fp:43, fn:172, tp:19932},
     {tau:0.51, tn:26928, fp:42, fn:173, tp:19931},
     {tau:0.52, tn:26929, fp:41, fn:173, tp:19931},
     {tau:0.53, tn:26930, fp:40, fn:173, tp:19931},
@@ -1356,7 +1539,7 @@ const anchorPoints = [
     {tau:0.57, tn:26933, fp:37, fn:177, tp:19927},
     {tau:0.58, tn:26934, fp:36, fn:177, tp:19927},
     {tau:0.59, tn:26934, fp:36, fn:177, tp:19927},
-    {tau:0.60, tn:26934, fp:36, fn:179, tp:19925},
+    {tau:0.6, tn:26934, fp:36, fn:179, tp:19925},
     {tau:0.61, tn:26940, fp:30, fn:182, tp:19922},
     {tau:0.62, tn:26941, fp:29, fn:185, tp:19919},
     {tau:0.63, tn:26944, fp:26, fn:188, tp:19916},
@@ -1366,7 +1549,7 @@ const anchorPoints = [
     {tau:0.67, tn:26946, fp:24, fn:189, tp:19915},
     {tau:0.68, tn:26947, fp:23, fn:189, tp:19915},
     {tau:0.69, tn:26947, fp:23, fn:190, tp:19914},
-    {tau:0.70, tn:26949, fp:21, fn:192, tp:19912},
+    {tau:0.7, tn:26949, fp:21, fn:192, tp:19912},
     {tau:0.71, tn:26950, fp:20, fn:192, tp:19912},
     {tau:0.72, tn:26950, fp:20, fn:193, tp:19911},
     {tau:0.73, tn:26950, fp:20, fn:194, tp:19910},
@@ -1376,7 +1559,7 @@ const anchorPoints = [
     {tau:0.77, tn:26955, fp:15, fn:200, tp:19904},
     {tau:0.78, tn:26956, fp:14, fn:200, tp:19904},
     {tau:0.79, tn:26956, fp:14, fn:200, tp:19904},
-    {tau:0.80, tn:26957, fp:13, fn:200, tp:19904},
+    {tau:0.8, tn:26957, fp:13, fn:200, tp:19904},
     {tau:0.81, tn:26957, fp:13, fn:200, tp:19904},
     {tau:0.82, tn:26958, fp:12, fn:200, tp:19904},
     {tau:0.83, tn:26958, fp:12, fn:200, tp:19904},
@@ -1386,7 +1569,7 @@ const anchorPoints = [
     {tau:0.87, tn:26960, fp:10, fn:206, tp:19898},
     {tau:0.88, tn:26961, fp:9, fn:206, tp:19898},
     {tau:0.89, tn:26961, fp:9, fn:206, tp:19898},
-    {tau:0.90, tn:26962, fp:8, fn:209, tp:19895},
+    {tau:0.9, tn:26962, fp:8, fn:209, tp:19895},
     {tau:0.91, tn:26962, fp:8, fn:210, tp:19894},
     {tau:0.92, tn:26962, fp:8, fn:212, tp:19892},
     {tau:0.93, tn:26962, fp:8, fn:216, tp:19888},
@@ -1395,37 +1578,14 @@ const anchorPoints = [
     {tau:0.96, tn:26964, fp:6, fn:239, tp:19865},
     {tau:0.97, tn:26964, fp:6, fn:252, tp:19852},
     {tau:0.98, tn:26966, fp:4, fn:273, tp:19831},
-    {tau:0.99, tn:26968, fp:2, fn:334, tp:19770},
+    {tau:0.99, tn:26968, fp:2, fn:334, tp:19770}
 ];
 
 function interpolateThreshold(tau) {
-    // Clamp
-    tau = Math.max(0.01, Math.min(0.99, tau));
-    // Find surrounding anchor points
-    let lo = anchorPoints[0], hi = anchorPoints[anchorPoints.length - 1];
-    for(let i = 0; i < anchorPoints.length - 1; i++) {
-        if(tau >= anchorPoints[i].tau && tau <= anchorPoints[i+1].tau) {
-            lo = anchorPoints[i];
-            hi = anchorPoints[i+1];
-            break;
-        }
-    }
-    if(lo.tau === hi.tau || Math.abs(tau - lo.tau) < 0.0001) {
-        return { tau: lo.tau, tn: lo.tn, fp: lo.fp, fn: lo.fn, tp: lo.tp };
-    }
-    if(Math.abs(tau - hi.tau) < 0.0001) {
-        return { tau: hi.tau, tn: hi.tn, fp: hi.fp, fn: hi.fn, tp: hi.tp };
-    }
-    const t = (tau - lo.tau) / (hi.tau - lo.tau);
-    const fp = Math.round(lo.fp + t * (hi.fp - lo.fp));
-    const tp = Math.round(lo.tp + t * (hi.tp - lo.tp));
-    return {
-        tau: tau,
-        tn: 26970 - fp,
-        fp: fp,
-        fn: 20104 - tp,
-        tp: tp,
-    };
+    // Exact lookup: return the nearest threshold that was exported from the notebook (no interpolation).
+    let best = anchorPoints[0];
+    for (const p of anchorPoints) { if (Math.abs(p.tau - tau) < Math.abs(best.tau - tau)) best = p; }
+    return { tau: best.tau, tn: best.tn, fp: best.fp, fn: best.fn, tp: best.tp };
 }
 
 function setThreshold(val) {
@@ -1435,8 +1595,8 @@ function setThreshold(val) {
 
 function updateThreshold(val) {
     val = parseFloat(val);
-    document.getElementById('thresholdValue').textContent = val.toFixed(4);
     const d = interpolateThreshold(val);
+    document.getElementById('thresholdValue').textContent = d.tau.toFixed(4);
     // Ensure counts sum correctly
     const totalLegit = 26970;
     const totalPhish = 20104;
@@ -1598,6 +1758,26 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Chart 3: EDA - feature presence by class (computed from repo working dataset)
+    const elEda = document.getElementById('edaChart');
+    if (elEda) {
+        new Chart(elEda.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Uses HTTPS', 'Has a path', 'Has ? = & % @', 'Has a digit', 'Hyphen in host', 'Suspicious keyword', 'Host is IP'],
+                datasets: [
+                    { label: 'Legitimate (n=134,850)', data: [100, 0, 0, 2.64, 7.46, 0.08, 0], backgroundColor: 'rgba(34,197,94,0.6)', borderColor: 'rgba(34,197,94,1)', borderWidth: 1 },
+                    { label: 'Phishing (n=100,520)', data: [48.63, 59.7, 7.49, 47.49, 31.15, 6.35, 0.6], backgroundColor: 'rgba(239,68,68,0.6)', borderColor: 'rgba(239,68,68,1)', borderWidth: 1 }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'top' } },
+                scales: { y: { beginAtZero: true, max: 100, title: { display: true, text: '% of URLs in class' } } }
+            }
+        });
+    }
+
     // ---- Chart 2: Experiment B Model Comparison ----
     const ctxB = document.getElementById('expBChart').getContext('2d');
     new Chart(ctxB, {
@@ -1695,6 +1875,37 @@ document.addEventListener('DOMContentLoaded', function() {
     fadeEls.forEach(el => fadeObserver.observe(el));
 });
 
+
+// ============================================================
+// ROBUSTNESS EXPLORER (values from results/final_results.json)
+// ============================================================
+const ROBUST = [{"id": "random", "title": "Main split: random stratified 60/20/20", "n": 47074, "rows": [["Logistic Regression", 0.9961386275239722, null], ["Decision Tree", 0.9948378978071906, null], ["Random Forest", 0.9968848795680335, null]], "note": "The headline setting. Rows from the same hostname can fall on both sides of the split."}, {"id": "grouped", "title": "Hostname-grouped split (no hostname in both train and test)", "n": 47284, "rows": [["Logistic Regression", 0.9958205534193579, null], ["Decision Tree", 0.9955892129244641, null], ["Random Forest", 0.9968090030214651, null]], "note": "Group key: hostname without \u201cwww.\u201d. Test set has 42.5% phishing. Scores are essentially unchanged, so hostname memorisation does not explain the headline AUC. (Grouping by hostname, not registered domain, is a limitation.)"}, {"id": "tuned", "title": "Validation-tuned hyper-parameters (main split)", "n": 47074, "rows": [["Logistic Regression", 0.9963465526167895, null], ["Decision Tree", 0.9977182776370436, null], ["Random Forest", 0.9976166426240942, null]], "note": "Grid selected on the validation set only; single seed. The tuned tree matches the tuned forest."}, {"id": "ablate", "title": "Drop uses_https, path_len_ratio and special_symbols", "n": 47074, "rows": [["Logistic Regression", 0.800679392631066, null], ["Decision Tree", 0.9887948223557118, null], ["Random Forest", 0.9938566377344299, null]], "note": "Logistic Regression collapses; tree models stay high because url_length \u2212 hostname_length still encodes whether a path or query exists, so this is not a clean removal of path information."}, {"id": "hard", "title": "Hard subset: bare HTTPS root URLs only (Random Forest)", "n": 27408, "rows": [["Random Forest", 0.8570597213545239, "\u03c4 = 0.5: recall 60.7%, precision 86.1%; \u03c4 = 0.0809: recall 69.4%, precision 55.1%"]], "note": "26,970 legitimate vs 438 phishing URLs with HTTPS, no path and no special symbols. Every false negative at both operating points lies in this subset."}, {"id": "extra", "title": "Two extra URL-only features (Random Forest)", "n": 47074, "rows": [["Random Forest, 13 features", 0.9968848795680335, null], ["Random Forest, + host_entropy, host_consonant_run", 0.9978275785714066, "false negatives at \u03c4 = 0.5: 172 \u2192 153"]], "note": "Single run, no confidence interval; reported as an extra experiment, not folded into the main results."}];
+function renderRobust(id) {
+    const sc = ROBUST.find(x => x.id === id);
+    document.querySelectorAll('#robustButtons button').forEach(b => {
+        const on = b.dataset.id === id;
+        b.setAttribute('aria-selected', on);
+        b.className = 'px-3 py-2 rounded-lg text-sm font-semibold border ' + (on ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-surface-700 border-surface-200 hover:bg-indigo-50');
+    });
+    const rows = sc.rows.map(r => `<tr><td class="font-semibold">${r[0]}</td><td class="font-mono">${r[1].toFixed(4)}</td><td class="text-xs text-surface-500">${r[2] || ''}</td></tr>`).join('');
+    document.getElementById('robustPanel').innerHTML = `
+        <h4 class="font-semibold text-surface-800 mb-1">${sc.title}</h4>
+        <p class="text-xs text-surface-500 mb-3">Test URLs: ${sc.n.toLocaleString()}</p>
+        <table class="data-table"><thead><tr><th>Model</th><th>Test ROC-AUC</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+        <p class="text-sm text-surface-600 mt-3 leading-relaxed">${sc.note}</p>`;
+}
+document.addEventListener('DOMContentLoaded', () => {
+    const box = document.getElementById('robustButtons');
+    if (!box) return;
+    ROBUST.forEach(sc => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.dataset.id = sc.id; b.setAttribute('role', 'tab');
+        b.textContent = sc.title.split(':')[0].split('(')[0].trim();
+        b.addEventListener('click', () => renderRobust(sc.id));
+        box.appendChild(b);
+    });
+    renderRobust('random');
+});
 </script>
 
 </body>
