@@ -1,0 +1,828 @@
+{
+  "split": {
+    "train": 141222,
+    "val": 47074,
+    "test": 47074,
+    "test_legit": 26970,
+    "test_phish": 20104
+  },
+  "tau_tuned": 0.08094059182991069,
+  "reproduces_notebook_exports": {
+    "experiment_a_validation": {
+      "Logistic Regression": {
+        "without": 0.9956,
+        "with": 0.9999,
+        "jump": 0.0042
+      },
+      "Decision Tree": {
+        "without": 0.9956,
+        "with": 0.9999,
+        "jump": 0.0044
+      }
+    },
+    "slider_thresholds_checked": 100
+  },
+  "main_default_models": {
+    "Logistic Regression": {
+      "roc_auc": 0.9961386275239722,
+      "tn": 26953,
+      "fp": 17,
+      "fn": 273,
+      "tp": 19831,
+      "accuracy": 0.9938394867655181,
+      "precision": 0.9991434905280129,
+      "recall": 0.9864206128133705,
+      "fpr": 0.0006303299962921765,
+      "f1": 0.992741289547457
+    },
+    "Decision Tree": {
+      "roc_auc": 0.9948378978071906,
+      "tn": 26903,
+      "fp": 67,
+      "fn": 175,
+      "tp": 19929,
+      "accuracy": 0.9948591579215703,
+      "precision": 0.9966493298659732,
+      "recall": 0.9912952646239555,
+      "fpr": 0.0024842417500926957,
+      "f1": 0.9939650872817956
+    },
+    "Random Forest": {
+      "roc_auc": 0.9968848795680335,
+      "tn": 26927,
+      "fp": 43,
+      "fn": 172,
+      "tp": 19932,
+      "accuracy": 0.9954327229468496,
+      "precision": 0.9978473091364205,
+      "recall": 0.9914444886589734,
+      "fpr": 0.0015943641082684463,
+      "f1": 0.9946355947004666
+    }
+  },
+  "rf_at_tuned_tau": {
+    "tn": 26722,
+    "fp": 248,
+    "fn": 134,
+    "tp": 19970,
+    "accuracy": 0.9918851170497515,
+    "precision": 0.9877337026412109,
+    "recall": 0.9933346597692002,
+    "fpr": 0.009195402298850575,
+    "f1": 0.9905262635781955
+  },
+  "baselines": {
+    "majority_class_always_legitimate": {
+      "tn": 26970,
+      "fp": 0,
+      "fn": 20104,
+      "tp": 0,
+      "accuracy": 0.5729277308068148,
+      "precision": null,
+      "recall": 0.0,
+      "fpr": 0.0,
+      "f1": 0.0
+    },
+    "rule_http_or_has_path": {
+      "tn": 26970,
+      "fp": 0,
+      "fn": 439,
+      "tp": 19665,
+      "accuracy": 0.9906742575519395,
+      "precision": 1.0,
+      "recall": 0.9781635495423796,
+      "fpr": 0.0,
+      "f1": 0.9889612512258291
+    },
+    "note": "The rule has no fitted parameters but was written after exploratory inspection of class-conditional feature rates on the full corpus (Section 3), so it is a diagnostic baseline, not an independent one."
+  },
+  "presence_by_class_pct": {
+    "Uses HTTPS": [
+      100.0,
+      48.63
+    ],
+    "Has a path": [
+      0.0,
+      59.7
+    ],
+    "Has ? = & % @": [
+      0.0,
+      7.49
+    ],
+    "Has a digit": [
+      2.64,
+      47.49
+    ],
+    "Hyphen in host": [
+      7.46,
+      31.15
+    ],
+    "Suspicious keyword": [
+      0.08,
+      6.35
+    ],
+    "Host is IP": [
+      0.0,
+      0.6
+    ]
+  },
+  "bootstrap": {
+    "n_resamples": 1000,
+    "roc_auc": {
+      "Logistic Regression": {
+        "point": 0.9961386275239722,
+        "ci95": [
+          0.9954659454830312,
+          0.9967948003963508
+        ]
+      },
+      "Decision Tree": {
+        "point": 0.9948378978071906,
+        "ci95": [
+          0.9939459782097804,
+          0.9956765960021967
+        ]
+      },
+      "Random Forest": {
+        "point": 0.9968848795680335,
+        "ci95": [
+          0.9962169518232369,
+          0.9975175126350206
+        ]
+      }
+    },
+    "auc_difference": {
+      "RF-LR": {
+        "point": 0.0007421669841480077,
+        "ci95": [
+          1.1847661590130846e-05,
+          0.0014028721031080459
+        ],
+        "frac_resamples_positive": 0.976
+      },
+      "RF-DT": {
+        "point": 0.002041478870888364,
+        "ci95": [
+          0.001515060763877102,
+          0.002623045745077915
+        ],
+        "frac_resamples_positive": 1.0
+      },
+      "LR-DT": {
+        "point": 0.001299311886740356,
+        "ci95": [
+          0.0004331048142062255,
+          0.002186589541919895
+        ],
+        "frac_resamples_positive": 0.998
+      }
+    },
+    "rf_at_tuned_tau": {
+      "recall": {
+        "ci95": [
+          0.9922133602192865,
+          0.9944167006752735
+        ]
+      },
+      "fpr": {
+        "ci95": [
+          0.008053890656833538,
+          0.010280882846569379
+        ]
+      },
+      "precision": {
+        "ci95": [
+          0.9862334198365508,
+          0.9892544598944834
+        ]
+      }
+    }
+  },
+  "tuning": {
+    "grid_dt": [
+      {
+        "val_auc": 0.9945224008312135,
+        "max_depth": 5,
+        "min_samples_leaf": 1
+      },
+      {
+        "val_auc": 0.9945224008312135,
+        "max_depth": 5,
+        "min_samples_leaf": 5
+      },
+      {
+        "val_auc": 0.9945224008312135,
+        "max_depth": 5,
+        "min_samples_leaf": 20
+      },
+      {
+        "val_auc": 0.9970469290132541,
+        "max_depth": 10,
+        "min_samples_leaf": 1
+      },
+      {
+        "val_auc": 0.997266170861465,
+        "max_depth": 10,
+        "min_samples_leaf": 5
+      },
+      {
+        "val_auc": 0.997405250207265,
+        "max_depth": 10,
+        "min_samples_leaf": 20
+      },
+      {
+        "val_auc": 0.9963198210241117,
+        "max_depth": 15,
+        "min_samples_leaf": 1
+      },
+      {
+        "val_auc": 0.9971497536134312,
+        "max_depth": 15,
+        "min_samples_leaf": 5
+      },
+      {
+        "val_auc": 0.9978671014543431,
+        "max_depth": 15,
+        "min_samples_leaf": 20
+      },
+      {
+        "val_auc": 0.9956453933059399,
+        "max_depth": 20,
+        "min_samples_leaf": 1
+      },
+      {
+        "val_auc": 0.9967409053935479,
+        "max_depth": 20,
+        "min_samples_leaf": 5
+      },
+      {
+        "val_auc": 0.9975993152256393,
+        "max_depth": 20,
+        "min_samples_leaf": 20
+      },
+      {
+        "val_auc": 0.9955923035956444,
+        "max_depth": null,
+        "min_samples_leaf": 1
+      },
+      {
+        "val_auc": 0.9967042495080458,
+        "max_depth": null,
+        "min_samples_leaf": 5
+      },
+      {
+        "val_auc": 0.9975431233669456,
+        "max_depth": null,
+        "min_samples_leaf": 20
+      }
+    ],
+    "grid_rf": [
+      {
+        "val_auc": 0.9973788321492053,
+        "n_estimators": 100,
+        "max_depth": null,
+        "min_samples_leaf": 1
+      },
+      {
+        "val_auc": 0.9978375452836206,
+        "n_estimators": 100,
+        "max_depth": null,
+        "min_samples_leaf": 5
+      },
+      {
+        "val_auc": 0.9977739143550313,
+        "n_estimators": 100,
+        "max_depth": null,
+        "min_samples_leaf": 20
+      },
+      {
+        "val_auc": 0.9978655586795899,
+        "n_estimators": 100,
+        "max_depth": 20,
+        "min_samples_leaf": 5
+      }
+    ],
+    "selected": {
+      "Logistic Regression": {
+        "C": 0.1
+      },
+      "Decision Tree": {
+        "max_depth": 15,
+        "min_samples_leaf": 20
+      },
+      "Random Forest": {
+        "n_estimators": 100,
+        "max_depth": 20,
+        "min_samples_leaf": 5
+      }
+    },
+    "val_auc_selected": {
+      "Decision Tree": 0.9978671014543431,
+      "Random Forest": 0.9978655586795899
+    },
+    "test_roc_auc_after_tuning": {
+      "Logistic Regression": 0.9963465526167895,
+      "Decision Tree": 0.9977182776370436,
+      "Random Forest": 0.9976166426240942
+    }
+  },
+  "overlap_random_split": {
+    "test_urls_whose_normalised_url_in_train": 0.01877894379062752,
+    "test_urls_whose_hostname_in_train": 0.07728257636912096,
+    "test_phishing_hostname_in_train": 0.18036211699164345,
+    "test_legit_hostname_in_train": 0.0004449388209121246,
+    "unique_hostnames": 219103,
+    "rows": 235370,
+    "note": "Hostnames = Domain column with leading \"www.\" removed."
+  },
+  "grouped_split": {
+    "group_key": "hostname without leading www.",
+    "train": 140004,
+    "val": 48082,
+    "test": 47284,
+    "test_phishing_share": 0.42547161830640384,
+    "shared_hostnames_train_test": 0,
+    "test_roc_auc": {
+      "Logistic Regression": 0.9958205534193579,
+      "Decision Tree": 0.9955892129244641,
+      "Random Forest": 0.9968090030214651
+    },
+    "rf_at_0p5": {
+      "tn": 27135,
+      "fp": 31,
+      "fn": 195,
+      "tp": 19923,
+      "accuracy": 0.9952203705270282,
+      "precision": 0.9984464267815977,
+      "recall": 0.9903071875932001,
+      "fpr": 0.0011411322977250976,
+      "f1": 0.9943601517268916
+    }
+  },
+  "ablation_drop_structure_features": {
+    "dropped": [
+      "uses_https",
+      "path_len_ratio",
+      "special_symbols"
+    ],
+    "kept": [
+      "url_length",
+      "hostname_length",
+      "dot_count",
+      "hyphen_count",
+      "digit_count",
+      "digit_ratio",
+      "subdomain_count",
+      "host_is_ip",
+      "suspicious_words",
+      "tld_length"
+    ],
+    "test_roc_auc": {
+      "Logistic Regression": 0.800679392631066,
+      "Decision Tree": 0.9887948223557118,
+      "Random Forest": 0.9938566377344299
+    }
+  },
+  "hard_subset_bare_https_root": {
+    "definition": "test rows with uses_https=1, no path, no special symbols",
+    "n": 27408,
+    "legit": 26970,
+    "phishing": 438,
+    "rf_roc_auc": 0.8570597213545239,
+    "rf_at_0p5": {
+      "tn": 26927,
+      "fp": 43,
+      "fn": 172,
+      "tp": 266,
+      "accuracy": 0.9921555750145943,
+      "precision": 0.86084142394822,
+      "recall": 0.6073059360730594,
+      "fpr": 0.0015943641082684463,
+      "f1": 0.7121820615796519
+    },
+    "rf_at_tuned_tau": {
+      "tn": 26722,
+      "fp": 248,
+      "fn": 134,
+      "tp": 304,
+      "accuracy": 0.9860624635143024,
+      "precision": 0.5507246376811594,
+      "recall": 0.6940639269406392,
+      "fpr": 0.009195402298850575,
+      "f1": 0.6141414141414141
+    }
+  },
+  "extra_features": {
+    "added": [
+      "host_entropy (Shannon entropy of the first hostname label)",
+      "host_consonant_run (longest consonant run in it)"
+    ],
+    "rf_test_roc_auc_13": 0.9968848795680335,
+    "rf_test_roc_auc_15": 0.9978275785714066,
+    "rf15_at_0p5": {
+      "tn": 26926,
+      "fp": 44,
+      "fn": 153,
+      "tp": 19951,
+      "accuracy": 0.9958150996303692,
+      "precision": 0.9977994498624656,
+      "recall": 0.9923895742140868,
+      "fpr": 0.001631442343344457,
+      "f1": 0.9950871592807801
+    },
+    "rf13_at_0p5": {
+      "tn": 26927,
+      "fp": 43,
+      "fn": 172,
+      "tp": 19932,
+      "accuracy": 0.9954327229468496,
+      "precision": 0.9978473091364205,
+      "recall": 0.9914444886589734,
+      "fpr": 0.0015943641082684463,
+      "f1": 0.9946355947004666
+    }
+  },
+  "errors_tuned_tau": {
+    "tau": 0.08094059182991069,
+    "n_fn": 134,
+    "n_fp": 248,
+    "fn_on_shared_hosting": 32,
+    "phishing_on_shared_hosting_total": 5331,
+    "fn_rate_shared_hosting": 0.006002626148940161,
+    "fn_rate_not_shared": 0.006904487917146145,
+    "fn_with_https_and_no_path": 134,
+    "phishing_https_no_path_total": 439,
+    "top_fn_platforms": {
+      "repl.co": 17,
+      "pantheonsite.io": 3,
+      "web.app": 2,
+      "pages.dev": 2,
+      "webflow.io": 1,
+      "duckdns.org": 1,
+      "csb.app": 1,
+      "org.ru": 1
+    },
+    "top_platforms_in_test_phishing": {
+      "firebaseapp.com": 1129,
+      "web.app": 1110,
+      "repl.co": 583,
+      "workers.dev": 271,
+      "square.site": 258,
+      "id.repl.co": 184,
+      "ipfs.dweb.link": 183,
+      "pantheonsite.io": 164
+    },
+    "fpr_by_hostname_length": {
+      "<=15": {
+        "n": 6421,
+        "fp": 21,
+        "rate": 0.0032705186108082855
+      },
+      "16-25": {
+        "n": 17824,
+        "fp": 82,
+        "rate": 0.004600538599640934
+      },
+      ">25": {
+        "n": 2725,
+        "fp": 145,
+        "rate": 0.05321100917431193
+      }
+    },
+    "fpr_by_hyphen": {
+      "no hyphen": {
+        "n": 24974,
+        "fp": 128,
+        "rate": 0.0051253303435573
+      },
+      ">=1 hyphen": {
+        "n": 1996,
+        "fp": 120,
+        "rate": 0.06012024048096192
+      }
+    },
+    "fpr_by_digits": {
+      "no digit": {
+        "n": 26272,
+        "fp": 151,
+        "rate": 0.005747563946406821
+      },
+      ">=1 digit": {
+        "n": 698,
+        "fp": 97,
+        "rate": 0.13896848137535817
+      }
+    },
+    "fpr_by_tld_top6_legit": {
+      "com": {
+        "n": 13818,
+        "fp": 87,
+        "rate": 0.006296135475466783
+      },
+      "org": {
+        "n": 3350,
+        "fp": 14,
+        "rate": 0.00417910447761194
+      },
+      "uk": {
+        "n": 1171,
+        "fp": 20,
+        "rate": 0.017079419299743808
+      },
+      "net": {
+        "n": 805,
+        "fp": 3,
+        "rate": 0.0037267080745341614
+      },
+      "de": {
+        "n": 664,
+        "fp": 33,
+        "rate": 0.04969879518072289
+      },
+      "au": {
+        "n": 517,
+        "fp": 7,
+        "rate": 0.013539651837524178
+      }
+    },
+    "first5_fp_in_test_order": [
+      {
+        "url": "https://www.pc.game",
+        "p": 0.1892
+      },
+      {
+        "url": "https://www.hannelore-kohl-stiftung.de",
+        "p": 0.2882
+      },
+      {
+        "url": "https://www.nationalcouncilofchurches.us",
+        "p": 0.1108
+      },
+      {
+        "url": "https://www.577records.com",
+        "p": 0.1425
+      },
+      {
+        "url": "https://www.reiner-lemoine-stiftung.de",
+        "p": 0.2882
+      }
+    ],
+    "first5_fn_in_test_order": [
+      {
+        "url": "https://what.promerc.repl.co",
+        "p": 0.0017
+      },
+      {
+        "url": "https://www.cfg.me",
+        "p": 0.0
+      },
+      {
+        "url": "https://s.smcbacmzu.icu",
+        "p": 0.0023
+      },
+      {
+        "url": "https://www.michelonturismo.com.br",
+        "p": 0.0103
+      },
+      {
+        "url": "https://dev-poliflek.pantheonsite.io",
+        "p": 0.0
+      }
+    ]
+  },
+  "errors_tau_0p5": {
+    "tau": 0.5,
+    "n_fn": 172,
+    "n_fp": 43,
+    "fn_on_shared_hosting": 52,
+    "phishing_on_shared_hosting_total": 5331,
+    "fn_rate_shared_hosting": 0.009754267492027763,
+    "fn_rate_not_shared": 0.008122926961348406,
+    "fn_with_https_and_no_path": 172,
+    "phishing_https_no_path_total": 439,
+    "top_fn_platforms": {
+      "repl.co": 31,
+      "pantheonsite.io": 6,
+      "web.app": 2,
+      "netlify.app": 2,
+      "pages.dev": 2,
+      "webflow.io": 1,
+      "duckdns.org": 1,
+      "workers.dev": 1
+    },
+    "top_platforms_in_test_phishing": {
+      "firebaseapp.com": 1129,
+      "web.app": 1110,
+      "repl.co": 583,
+      "workers.dev": 271,
+      "square.site": 258,
+      "id.repl.co": 184,
+      "ipfs.dweb.link": 183,
+      "pantheonsite.io": 164
+    },
+    "fpr_by_hostname_length": {
+      "<=15": {
+        "n": 6421,
+        "fp": 1,
+        "rate": 0.0001557389814670612
+      },
+      "16-25": {
+        "n": 17824,
+        "fp": 6,
+        "rate": 0.00033662477558348296
+      },
+      ">25": {
+        "n": 2725,
+        "fp": 36,
+        "rate": 0.013211009174311927
+      }
+    },
+    "fpr_by_hyphen": {
+      "no hyphen": {
+        "n": 24974,
+        "fp": 13,
+        "rate": 0.0005205413630175382
+      },
+      ">=1 hyphen": {
+        "n": 1996,
+        "fp": 30,
+        "rate": 0.01503006012024048
+      }
+    },
+    "fpr_by_digits": {
+      "no digit": {
+        "n": 26272,
+        "fp": 27,
+        "rate": 0.0010277101096224117
+      },
+      ">=1 digit": {
+        "n": 698,
+        "fp": 16,
+        "rate": 0.022922636103151862
+      }
+    },
+    "fpr_by_tld_top6_legit": {
+      "com": {
+        "n": 13818,
+        "fp": 14,
+        "rate": 0.0010131712259371835
+      },
+      "org": {
+        "n": 3350,
+        "fp": 4,
+        "rate": 0.0011940298507462687
+      },
+      "uk": {
+        "n": 1171,
+        "fp": 3,
+        "rate": 0.0025619128949615714
+      },
+      "net": {
+        "n": 805,
+        "fp": 1,
+        "rate": 0.0012422360248447205
+      },
+      "de": {
+        "n": 664,
+        "fp": 7,
+        "rate": 0.010542168674698794
+      },
+      "au": {
+        "n": 517,
+        "fp": 1,
+        "rate": 0.0019342359767891683
+      }
+    },
+    "first5_fp_in_test_order": [
+      {
+        "url": "https://www.euroafrica-interconnector.com",
+        "p": 0.6002
+      },
+      {
+        "url": "https://www.clwydianrangeanddeevalleyaonb.org.uk",
+        "p": 0.6136
+      },
+      {
+        "url": "https://www.wirtschaftsfoerderung-dortmund.de",
+        "p": 0.99
+      },
+      {
+        "url": "https://www.sarasota.wateratlas.usf.edu",
+        "p": 0.9767
+      },
+      {
+        "url": "https://www.business-services.upenn.edu",
+        "p": 0.6267
+      }
+    ],
+    "first5_fn_in_test_order": [
+      {
+        "url": "https://what.promerc.repl.co",
+        "p": 0.0017
+      },
+      {
+        "url": "https://www.cfg.me",
+        "p": 0.0
+      },
+      {
+        "url": "https://s.smcbacmzu.icu",
+        "p": 0.0023
+      },
+      {
+        "url": "https://www.michelonturismo.com.br",
+        "p": 0.0103
+      },
+      {
+        "url": "https://dev-poliflek.pantheonsite.io",
+        "p": 0.0
+      }
+    ]
+  },
+  "shared_hosting_in_test": {
+    "phishing": 5331,
+    "legit": 26
+  },
+  "calibration_rf": {
+    "bins": [
+      {
+        "bin": "0.0-0.1",
+        "n": 26894,
+        "mean_pred": 0.004603397287639038,
+        "frac_phishing": 0.005019706997843385
+      },
+      {
+        "bin": "0.1-0.2",
+        "n": 91,
+        "mean_pred": 0.1510570573950982,
+        "frac_phishing": 0.15384615384615385
+      },
+      {
+        "bin": "0.2-0.3",
+        "n": 58,
+        "mean_pred": 0.2514960802500512,
+        "frac_phishing": 0.20689655172413793
+      },
+      {
+        "bin": "0.3-0.4",
+        "n": 26,
+        "mean_pred": 0.33903324536277335,
+        "frac_phishing": 0.11538461538461539
+      },
+      {
+        "bin": "0.4-0.5",
+        "n": 30,
+        "mean_pred": 0.45798548365535663,
+        "frac_phishing": 0.26666666666666666
+      },
+      {
+        "bin": "0.5-0.6",
+        "n": 15,
+        "mean_pred": 0.5486146705146705,
+        "frac_phishing": 0.5333333333333333
+      },
+      {
+        "bin": "0.6-0.7",
+        "n": 27,
+        "mean_pred": 0.6336046496260798,
+        "frac_phishing": 0.4444444444444444
+      },
+      {
+        "bin": "0.7-0.8",
+        "n": 16,
+        "mean_pred": 0.7493502435064935,
+        "frac_phishing": 0.5
+      },
+      {
+        "bin": "0.8-0.9",
+        "n": 14,
+        "mean_pred": 0.8546034139938562,
+        "frac_phishing": 0.6428571428571429
+      },
+      {
+        "bin": "0.9-1.0",
+        "n": 19903,
+        "mean_pred": 0.9997007345126301,
+        "frac_phishing": 0.999598050545144
+      }
+    ],
+    "ece": 0.0008481446012957527,
+    "brier": 0.004129400760518363,
+    "note": "Calibration is measured on the benchmark test split (about 43% phishing). It says nothing about calibration under a different phishing prevalence."
+  },
+  "prevalence_adjusted_ppv": {
+    "tuned": {
+      "tau": 0.08094059182991069,
+      "tpr": 0.9933346597692002,
+      "fpr": 0.009195402298850575,
+      "ppv_pi_1pct": 0.5217972176341205,
+      "ppv_pi_0p1pct": 0.09758147302344822
+    },
+    "tau_0.90": {
+      "tau": 0.9,
+      "tpr": 0.9896040588937525,
+      "fpr": 0.00029662588060808305,
+      "ppv_pi_1pct": 0.9711807397932574,
+      "ppv_pi_0p1pct": 0.7695609472212811
+    }
+  }
+}
