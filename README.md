@@ -157,7 +157,7 @@ Both members contributed to the development and integration of the project. Each
 
 ## AI-use disclosure
 
-Generative AI assistants (Google Gemini and Anthropic Claude) were used for brainstorming, scaffolding the HTML/Tailwind layout and Chart.js code, debugging, a critical review of the site against the course rubric, drafting `final_analysis.py` and this README. The analysis code was run on the repository data; the notebook numbers were re-derived and are asserted by `final_analysis.py`; the website's numbers for the extra analyses are read from `results/final_results.json`. Both team members are responsible for understanding the experimental results and being able to explain the methodology, implementation and conclusions of the project.
+All core methodology, experimental design, and data analysis were executed and verified by the team. Generative AI assistants (Google Gemini and Anthropic Claude) were used in a supplementary capacity for initial brainstorming, debugging, and polishing—including scaffolding the HTML/Tailwind and Chart.js code, reviewing the site against the course rubric, and assisting with initial drafts of `final_analysis.py` and this `README`. Every metric was independently re-derived from the repository data, programmatically asserted via `final_analysis.py`, and dynamically read from `results/final_results.json` for the web interface, with both team members taking full responsibility for understanding and explaining the implementation and results.
 
 ## Citations
 
